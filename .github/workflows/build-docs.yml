@@ -5,10 +5,14 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  pages: write
+
 env:
   INSTANCE: 'tech-doc/td'
   ARTIFACT: 'webHelpTD2-all.zip'
-  DOCKER_VERSION: '233.14389'
+  DOCKER_VERSION: '232.10275'
   ALGOLIA_ARTIFACT: 'algolia-indexes-TD.zip'
   ALGOLIA_APP_NAME: 'NLAGB2LZHU'
   ALGOLIA_INDEX_NAME: 'MY_INDEX'

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rules SYSTEM "https://resources.jetbrains.com/writerside/1.0/redirection-rules.dtd">
+<rules>
+    <!-- format is as follows
+    <rule id="<unique id>">
+        <accepts>page.html</accepts>
+    </rule>
+    -->
+    <rule id="4a96be71">
+        <description><![CDATA[Created after removal of "<Java基础-原码、补码、反码.md>" from Tech Doc]]></description>
+        <accepts>Java基础-原码、补码、反码.html</accepts>
+    </rule>
+    <rule id="6927a3b4">
+        <description><![CDATA[Created after removal of "<Java基础-数据类型和运算符.md>" from Tech Doc]]></description>
+        <accepts>Java基础-数据类型和运算符.html</accepts>
+    </rule>
+</rules>

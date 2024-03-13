@@ -1,15 +1,90 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version=".0" encoding="UTF-8"?>
 <!DOCTYPE instance-profile
-        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+        SYSTEM "https://resources.jetbrains.com/writerside/.0/product-profile.dtd">
 
 <instance-profile id="td"
                   name="Tech Doc"
                   start-page="index.md">
 
     <toc-element topic="index.md" hidden="true"/>
+    <toc-element toc-title="必修课">
+        <toc-element toc-title="数据结构和算法">
+        </toc-element>
+        <toc-element toc-title="计算机操作系统">
+        </toc-element>
+        <toc-element toc-title="计算机网络">
+        </toc-element>
+    </toc-element>
     <toc-element toc-title="Java">
+        <toc-element toc-title="基础知识">
+            <toc-element topic="Java基础-数据类型和运算符.md"/>
+            <toc-element topic="Java基础-原码, 反码, 补码.md"/>
+            <toc-element topic="Java基础-数组.md"/>
+        </toc-element>
+        <toc-element toc-title="并发编程">
+            <toc-element topic="并发理论接触：内存屏障.md"/>
+            <toc-element topic="并发理论基础：Java 内存模型JMM.md"/>
+            <toc-element topic="并发理论基础：并发与并行.md"/>
+            <toc-element topic="并发理论基础：原子性问题.md"/>
+            <toc-element topic="并发理论基础：并发问题产生的三大根源.md"/>
+            <toc-element topic="并发理论基础：缓存可见性、MESI.md"/>
+            <toc-element topic="深入理解Volatile.md"/>
+            <toc-element topic="并发理论基础：指令重排序现象.md"/>
+        </toc-element>
+        <toc-element toc-title="集合框架">
+            <toc-element topic="集合框架总览.md"/>
+        </toc-element>
         <toc-element toc-title="JVM">
             <toc-element topic="JVM-Memory-Structure.md"/>
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="源码框架">
+        <toc-element toc-title="Spring">
+        </toc-element>
+        <toc-element toc-title="Spring Boot">
+        </toc-element>
+        <toc-element toc-title="MyBatis">
+        </toc-element>
+        <toc-element toc-title="Netty">
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="数据库">
+        <toc-element toc-title="MySQL">
+            <toc-element topic="MySQL数据类型.md"/>
+        </toc-element>
+        <toc-element toc-title="Redis">
+        </toc-element>
+        <toc-element toc-title="MongoDB">
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="设计与理论">
+        <toc-element toc-title="设计模式">
+            <toc-element topic="设计模式-概述.md"/>
+            <toc-element topic="UML-类图.md"/>
+            <toc-element topic="设计模式-单例模式.md"/>
+            <toc-element topic="设计模式-简单工厂模式.md"/>
+            <toc-element topic="设计模式-工厂模式.md"/>
+            <toc-element topic="设计模式-抽象工厂.md"/>
+            <toc-element topic="设计模式-工厂三兄弟.md"/>
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="工具">
+        <toc-element toc-title="Git">
+        </toc-element>
+        <toc-element toc-title="Maven">
+            <toc-element topic="Maven-Idea查看解决jar包冲突.md"/>
+            <toc-element topic="Maven-约定优于配置.md"/>
+            <toc-element topic="Maven-初识.md"/>
+            <toc-element topic="Maven-setting-xml.md"/>
+            <toc-element topic="Maven-依赖关系.md"/>
+            <toc-element topic="Maven-构建生命周期.md"/>
+            <toc-element topic="Maven-仓库.md"/>
+            <toc-element topic="Maven-POM.md"/>
+            <toc-element topic="Maven-命令.md"/>
+            <toc-element topic="Maven-项目模板.md"/>
+            <toc-element topic="Maven-插件.md"/>
+        </toc-element>
+        <toc-element toc-title="Docker">
         </toc-element>
     </toc-element>
 

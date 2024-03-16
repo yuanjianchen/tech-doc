@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE instance-profile
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+
+<instance-profile id="td"
+                 name="Tech Doc"
+                 start-page="关于.md">
+
+    <toc-element topic="关于.md"/>
+    <toc-element topic="Writerside使用手册.md">
+        <toc-element topic="标记.md">
+            <toc-element topic="语义标记.md"/>
+        </toc-element>
+    </toc-element>
+</instance-profile>

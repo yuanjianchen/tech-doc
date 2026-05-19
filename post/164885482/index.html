@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="C 给我们提供了各种各样的运算符，我们可以用来操作数据。"><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>三、运算符 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/C语言入门手册/">C语言入门手册</a> <span>2021/12/23</span>  <span>2 分钟阅读</span> </div> <h1>三、运算符</h1>  <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/C语言/">
+#C语言 </a> </div> </header> <div class="prose" data-pagefind-body>  <p>C 给我们提供了各种各样的运算符，我们可以用来操作数据。</p>
+<p>特别地，我们可以识别不同分组的运算符：</p>
+<ul>
+<li>算术运算符</li>
+<li>比较运算符</li>
+<li>逻辑运算符</li>
+<li>复合赋值运算符</li>
+<li>位运算符</li>
+<li>指针运算符</li>
+<li>结构运算符</li>
+<li>混合运算符</li>
+</ul>
+<p>在这一节中，我们将用两个假想的变量 <code>a</code> 和 <code>b</code> 举例，详细介绍所有这些运算符。</p>
+<p>为了简单起见，本篇不会介绍位运算符、结构运算符和指针运算符。</p>
+<h1 id="算术运算符">算术运算符</h1>
+<p>算术运算符可以分为二元运算符和一元运算符。</p>
+<p>二元操作符需要两个操作数：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">操作符</th><th align="left">名字</th><th align="left">示例</th></tr></thead><tbody><tr><td align="left"><code>=</code></td><td align="left">赋值</td><td align="left"><code>a = b</code></td></tr><tr><td align="left"><code>+</code></td><td align="left">加</td><td align="left"><code>a + b</code></td></tr><tr><td align="left"><code>-</code></td><td align="left">减</td><td align="left"><code>a - b</code></td></tr><tr><td align="left"><code>*</code></td><td align="left">乘</td><td align="left"><code>a * b</code></td></tr><tr><td align="left"><code>/</code></td><td align="left">除</td><td align="left"><code>a / b</code></td></tr><tr><td align="left"><code>%</code></td><td align="left">取模</td><td align="left"><code>a % b</code></td></tr></tbody></table>
+<p>一元运算符只需要一个操作数：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">运算符</th><th align="left">名字</th><th align="left">示例</th></tr></thead><tbody><tr><td align="left"><code>+</code></td><td align="left">一元加（正值）</td><td align="left"><code>+a</code></td></tr><tr><td align="left"><code>-</code></td><td align="left">一元减（负值）</td><td align="left"><code>-a</code></td></tr><tr><td align="left"><code>++</code></td><td align="left">自增</td><td align="left"><code>a++</code> or <code>++a</code></td></tr><tr><td align="left"><code>--</code></td><td align="left">自减</td><td align="left"><code>a--</code> or <code>--a</code></td></tr></tbody></table>
+<p><code>a++</code> 与 <code>++a</code> 的区别在于：<code>a++</code> 在使用 <code>a</code> 之后才自增它的值，而 <code>++a</code> 会在使用 <code>a</code> 之前自增它的值。</p>
+<p>例如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> b;</span></span>
+<span class="line"><span style="color:#E1E4E8">b </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> a</span><span style="color:#F97583">++</span><span style="color:#6A737D"> /* b 为 2，a 为 3 */</span></span>
+<span class="line"><span style="color:#E1E4E8">b </span><span style="color:#F97583">=</span><span style="color:#F97583"> ++</span><span style="color:#E1E4E8">a</span><span style="color:#6A737D"> /* b 为 4，a 为 4 */</span></span></code></pre>
+<p>这也适用于递减运算符。</p>
+<h1 id="比较运算符">比较运算符</h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">运算符</th><th align="left">名字</th><th align="left">示例</th></tr></thead><tbody><tr><td align="left"><code>==</code></td><td align="left">相等</td><td align="left"><code>a == b</code></td></tr><tr><td align="left"><code>!=</code></td><td align="left">不相等</td><td align="left"><code>a != b</code></td></tr><tr><td align="left"><code>></code></td><td align="left">大于</td><td align="left"><code>a > b</code></td></tr><tr><td align="left"><code>&#x3C;</code></td><td align="left">小于</td><td align="left"><code>a &#x3C; b</code></td></tr><tr><td align="left"><code>>=</code></td><td align="left">大于等于</td><td align="left"><code>a >= b</code></td></tr><tr><td align="left"><code>&#x3C;=</code></td><td align="left">小于等于</td><td align="left"><code>a &#x3C;= b</code></td></tr></tbody></table>
+<h1 id="逻辑运算符">逻辑运算符</h1>
+<ul>
+<li><code>!</code> 非（例如：<code>!a</code>）</li>
+<li><code>&#x26;&#x26;</code> 与（例如：<code>a &#x26;&#x26; b</code>）</li>
+<li><code>||</code> 或（例如：<code>a || b</code>）</li>
+</ul>
+<p>这些运算符在使用布尔值时非常有用。</p>
+<h1 id="复合赋值运算符">复合赋值运算符</h1>
+<p>当赋值与算术运算同时进行时，这些运算符非常有用。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">运算符</th><th align="left">名字</th><th align="left">示例</th></tr></thead><tbody><tr><td align="left"><code>+=</code></td><td align="left">加且赋值</td><td align="left"><code>a += b</code></td></tr><tr><td align="left"><code>-=</code></td><td align="left">减且赋值</td><td align="left"><code>a -= b</code></td></tr><tr><td align="left"><code>*=</code></td><td align="left">乘且赋值</td><td align="left"><code>a *= b</code></td></tr><tr><td align="left"><code>/=</code></td><td align="left">除且赋值</td><td align="left"><code>a /= b</code></td></tr><tr><td align="left"><code>%=</code></td><td align="left">求模且赋值</td><td align="left"><code>a %= b</code></td></tr></tbody></table>
+<h1 id="三目运算符">三目运算符</h1>
+<p>三目运算符是 C 中唯一一个使用三个操作数的运算符，并且它是表达条件的简便方法。</p>
+<p><code>&#x3C;条件> ? &#x3C;表达式> : &#x3C;表达式></code></p>
+<p>示例：</p>
+<p>若 <code>a</code> 的值为 <code>true</code>，就执行语句 <code>b</code>，否则执行语句 <code>c</code>。</p>
+<p>三目运算符的功能与 if/else 条件语句相同，但是它更短，还可以被内联进表达式。</p>
+<h1 id="sizeof">sizeof</h1>
+<p><code>sizeof</code> 运算符返回传入的操作数的大小。可以传入变量，或者甚至是类型也可以。</p>
+<p>使用示例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;stdio.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 37</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">  printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%ld\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(age));</span></span>
+<span class="line"><span style="color:#B392F0">  printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%ld</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h1 id="运算符优先级">运算符优先级</h1>
+<p>对于所有的这些运算符（以及我们还没有在本文中介绍的其它运算符，包括位运算符、结构运算符和指针运算符），我们在单个表达式中一起使用它们时必须要留意。</p>
+<p>假如我们有这个运算：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> b </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 4</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> c </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> b </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">*</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">/</span><span style="color:#E1E4E8"> b </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> a;</span></span></code></pre>
+<p><code>c</code> 的值是多少？我们在执行乘和除之前有进行加法操作吗？</p>
+<p>按照顺序，优先级从低到高：</p>
+<ul>
+<li>赋值运算符 <code>=</code></li>
+<li>二元运算符 <code>+</code> 和 <code>-</code></li>
+<li>运算符 <code>*</code> 和 <code>/</code></li>
+<li>一元运算符 <code>+</code> 和 <code>-</code></li>
+</ul>
+<p>运算符还具有关联规则，除了一元运算符和赋值运算符之外，该规则总是从左到右的。</p>
+<p>在：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> c </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> b </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">*</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">/</span><span style="color:#E1E4E8"> b </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> a;</span></span></code></pre>
+<p>中，我们首先执行 <code>a * a / b</code>，由于是从左到右的，我们可以拆分为 <code>a * a</code> 与其结果 <code>/b</code>：<code>2 * 2 = 4</code>，<code>4 / 4 = 1</code>。</p>
+<p>然后我们可以进行加法操作和减法操作：4 + 1 - 2。<code>c</code> 的值是 <code>3</code>。</p>
+<p>括号的优先级比其它任何运算符都要高。</p>
+<p>上述示例表达式可以被重写为：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> c </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> b </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> ((a </span><span style="color:#F97583">*</span><span style="color:#E1E4E8"> a) </span><span style="color:#F97583">/</span><span style="color:#E1E4E8"> b) </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> a;</span></span></code></pre>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885485/"><span>上一篇</span><strong>二、变量与类型</strong></a> <a href="/post/164885503/"><span>下一篇</span><strong>四、条件语句</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885489/"> <span>2021/12/24 · C语言入门手册</span> <strong>八、指针</strong> </a><a href="/post/164885498/"> <span>2021/12/24 · C语言入门手册</span> <strong>十一、变量作用域</strong> </a><a href="/post/164885499/"> <span>2021/12/24 · C语言入门手册</span> <strong>十三、命令行参数</strong> </a> </div> </section> </footer> </div>  </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

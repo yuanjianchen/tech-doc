@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Archetype是一个Maven项目的模板工具包，它定义了一类项目的基本架构。Archetype为开发人员提供了创建Maven项目的模板，同时它也可以根据已有的Maven项目生成参数化的模板。通过Archetype，开发人员可以很方便地将一类项目的最佳实现应用到自己的项目中。在一个Maven项目中，开发者可以通..."><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>Maven-项目模板 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/Maven/">Maven</a> <span>2020/08/03</span>  <span>2 分钟阅读</span> </div> <h1>Maven-项目模板</h1> <p>Archetype是一个Maven项目的模板工具包，它定义了一类项目的基本架构。Archetype为开发人员提供了创建Maven项目的模板，同时它也可以根据已有的Maven项目生成参数化的模板。通过Archetype，开发人员可以很方便地将一类项目的最佳实现应用到自己的项目中。在一个Maven项目中，开发者可以通...</p> <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/maven/">
+#maven </a> </div> </header> <div class="prose" data-pagefind-body>  <h2 id="archetype介绍">Archetype介绍</h2>
+<p><code>Archetype</code>是一个Maven项目的模板工具包，它定义了一类项目的基本架构。<code>Archetype</code>为开发人员提供了创建Maven项目的模板，同时它也可以根据已有的Maven项目生成参数化的模板。通过<code>Archetype</code>，开发人员可以很方便地将一类项目的最佳实现应用到自己的项目中。在一个Maven项目中，开发者可以通过<code>Archetype</code>提供的范例快速入门并了解该项目的结构与特点。
+官方文档:<a href="https://maven.apache.org/archetype/index.html">https://maven.apache.org/archetype/index.html</a></p>
+<h2 id="archetype使用">Archetype使用</h2>
+<h4 id="idea中创建">IDEA中创建</h4>
+<p>在IDEA中，我们可以通过<code>New Project – Maven – Create from archetype</code>,选择某个<code>archetype</code>快速创建模板项目
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140403890.png" alt="IDEA创建模板"></p>
+<h4 id="命令创建">命令创建</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>mvn archetype:generate</span></span></code></pre>
+<ul>
+<li>
+<p>输入命令后，Archetype插件会输出一个Archetype列表供用户选择；选择自己想要使用的Archetype，输入对应编号</p>
+</li>
+<li>
+<p>提示输入一些基本参数，如groupId,artifactId,version,package等</p>
+</li>
+<li>
+<p>Archetype插件生成项目骨架
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140408427.png" alt="命令创建"></p>
+</li>
+</ul>
+<h4 id="过滤器方式创建">过滤器方式创建</h4>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140423448.png" alt="过滤器方式">
+跳过了选择<code>archetype</code>步骤</p>
+<h2 id="常用的archetype">常用的archetype</h2>
+<p><code>maven-archetype-quickstart</code></p>
+<p>默认的Archetype,基本内容包括：</p>
+<ul>
+<li>一个包含junit依赖声明的pom.xml</li>
+<li>src/main/java主代码目录及一个名为App的类</li>
+<li>src/test/java测试代码目录及一个名为AppTest的测试用例</li>
+</ul>
+<p><code>maven-archetype-webapp</code></p>
+<p>一个最简单的Maven war项目模板，当需要快速创建一个Web应用的时候可以使用它。生成的项目内容包括：</p>
+<ul>
+<li>一个packaging为war且带有junit依赖声明的pom.xml</li>
+<li>src/main/webapp/目录</li>
+<li>src/main/webapp/index.jsp文件</li>
+<li>src/main/webapp/WEB-INF/web.xml文件</li>
+</ul>
+<h2 id="archetype开发">Archetype开发</h2>
+<h3 id="创建自定义模板">创建自定义模板</h3>
+<p>1.在maven项目下，执行<code>mvn archetype:create-from-project</code>，在<code>target/generated-sources/archetype</code>目录下生成Archetype project
+2.<code>cd target/generated-sources/archetype</code>后，<code>mvn install</code>安装archetype project到本地仓库</p>
+<p>ps：如果是maven多模块项目，在根目录下执行mvn archetype:create-from-project</p>
+<p>mvn install后，会在本地的maven仓库，按照maven坐标创建对应的archetype文件</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140439037.png" alt="步骤"></p>
+<p>官方介绍：<a href="https://maven.apache.org/archetype/maven-archetype-plugin/advanced-usage.html">https://maven.apache.org/archetype/maven-archetype-plugin/advanced-usage.html</a></p>
+<p><strong>例子:</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140452727.png" alt=""></p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140504705.png" alt=""></p>
+<p>本地仓库中生成的archetype模板</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140601497.png" alt=""></p>
+<h3 id="使用自定义模板">使用自定义模板</h3>
+<p>1.在当前的目录下，<code>mvn archetype:generate -DarchetypeCatalog=local</code>，查看本地archetype列表</p>
+<p>2.choose number，按步骤输入基本参数groupId/artifactId/version/package</p>
+<p>3.在当前目录下，以artifactId为目录创建一个新的项目</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140623582.png" alt=""></p>
+<h3 id=""><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140637636.png" alt=""></h3>
+<h3 id="添加到idea">添加到IDEA</h3>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140651482.png" alt=""></p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140710775.png" alt=""></p>
+<p>添加自定义属性参数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140729528.png" alt=""></p>
+<h2 id="archetype配置">Archetype配置</h2>
+<p><code>mvn archetype:generate -DarchetypeCatalog=local</code></p>
+<p>对应的本地archetype列表，在本地maven仓库的archetype-catalog.xml中 ,比如: ~/.m2/repository/archetype-catalog.xml</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140738072.png" alt=""></p>
+<p>IDEA中的archtype配置,在 ~/Library/Caches/IntelliJIdea2017.1/Maven/Indices/UserArchetypes.xml中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140741778.png" alt=""></p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803140754303.png" alt=""></p>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885518/"><span>上一篇</span><strong>Maven-setting-xml</strong></a> <a href="/post/164885526/"><span>下一篇</span><strong>Maven-约定优于配置</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885517/"> <span>2020/08/03 · Maven</span> <strong>Maven-POM</strong> </a><a href="/post/164885513/"> <span>2020/08/03 · Maven</span> <strong>Maven-Idea查看解决jar包冲突</strong> </a><a href="/post/164885524/"> <span>2020/08/03 · Maven</span> <strong>Maven-插件</strong> </a> </div> </section> </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-2" href="#archetype介绍">Archetype介绍</a><a class="toc-depth-2" href="#archetype使用">Archetype使用</a><a class="toc-depth-2" href="#常用的archetype">常用的archetype</a><a class="toc-depth-2" href="#archetype开发">Archetype开发</a><a class="toc-depth-3" href="#创建自定义模板">创建自定义模板</a><a class="toc-depth-3" href="#使用自定义模板">使用自定义模板</a><a class="toc-depth-3" href="#"></a><a class="toc-depth-3" href="#添加到idea">添加到IDEA</a><a class="toc-depth-2" href="#archetype配置">Archetype配置</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

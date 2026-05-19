@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="数组是编程语言中最常见的一种数据结构,可以用于储存多个数据,通常可通过数组元素的索引来访问数组元素,包括数组元素赋值和取出数组元素的值."><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>数组 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/基础知识/">基础知识</a> <span>2020/08/03</span>  <span>5 分钟阅读</span> </div> <h1>数组</h1>  <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/Java/">
+#Java </a> </div> </header> <div class="prose" data-pagefind-body>  <p>数组是编程语言中最常见的一种数据结构,可以用于储存多个数据,通常可通过数组元素的索引来访问数组元素,包括数组元素赋值和取出数组元素的值.</p>
+<h2 id="初识数组">初识数组</h2>
+<ul>
+<li>数组也是一种类型,属于引用数据类型.</li>
+<li>数组元素的类型是唯一的,一个数组里只能存储一种类型的数据.</li>
+<li>数组的长度是固定的,即一个数组一单初始化完成,数组在内存中所占的空间将被固定下来,长度不在发生改变.即使把某个数组的元素清空,其所占的空间依然被保留.</li>
+</ul>
+<h2 id="数组的初始化">数组的初始化</h2>
+<h3 id="定义数组变量">定义数组变量</h3>
+<p>Java支持两种语法格式定义数组:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">type[] arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">type arr[];</span></span></code></pre>
+<p>对于这两种定义而言,通常使用第一种格式来定义数组,因为第一种有更好的语义.第二种容易和变量名混淆</p>
+<h3 id="初始化">初始化</h3>
+<p>Java 数组只有初始化之后才能使用,所谓的初始化,就是为数组的元素分配内存空间.并为每个数组元素赋初始值.</p>
+<h4 id="静态初始化">静态初始化</h4>
+<p>由程序员显示的指定每个数组原始的初始值.由系统决定数组的长度.
+静态初始化的语法格式为:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">type[] arr </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> type[]{item1, item2, item3,...};</span></span></code></pre>
+<p><code>type</code> 为数组元素的数据类型, 数组元素类型必须为 <code>type</code> 类型,或者其子类的实例.
+除此之外,静态初始化还有如下简化的语法格式:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">type[] arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {item1, item2, item3 ...};</span></span></code></pre>
+<h4 id="动态初始化">动态初始化</h4>
+<p>动态初始化只指定数组的长度,由系统为每个元素指定初始值,动态初始化的语法格式如下:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">type[] arr </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> type[length];</span></span></code></pre>
+<p>上面的语法中,需要指定一个 int 类型的 length 参数,这个参数指定了数组的长度.
+执行动态初始化时,程序员只指定数组的长度,数组元素的初始值由系统按照如下自动分配</p>
+<ul>
+<li>数组元素类型是基本类型中的整数类型(byte, short, int, long),则数组元素的值是 0.</li>
+<li>数组元素类型是基本类型中的浮点类型(float, double),则数组元素的值是 0.0.</li>
+<li>数组元素类型是基本类型中的字符类型(char),则数组元素的值是’\u0000’.</li>
+<li>数组元素的类型是基本类型中的布尔类型(boolean),则数组元素的值是 false.</li>
+<li>数组元素的类型是引用类型(类,接口,数组),则数组元素的值是 null;</li>
+</ul>
+<h2 id="数组的访问">数组的访问</h2>
+<p>数组最常用的方法就是访问数组元素,包括对数组元素进行赋值和取出数组元素.</p>
+<h3 id="数组元素读取赋值">数组元素读取、赋值</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8">[] arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">// 数组取值 通过 arr[index] 访问</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#6A737D">// arr 为{1,3,3}</span></span>
+<span class="line"><span style="color:#E1E4E8">arr[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 3</span></span></code></pre>
+<p>如果访问数组元素时指定的索引值小于0,或者大于等于数组的长度,编译程序时不会出现任何错误,但运行时出现异常<code>java.lang.ArrayIndexOutOfBoundsException:N</code>(数组越界异常), <code>N</code> 就是试图访问的数组索引.</p>
+<h3 id="数组的遍历">数组的遍历</h3>
+<h4 id="for-循环"><code>for</code> 循环</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8">[] arr </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">5</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#6A737D">// 输出 5 个 0</span></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr.length; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">){</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(arr[i])</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#E1E4E8">arr[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">arr[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">// 输出 0 1 2 0 0</span></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr.length; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">){</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(arr[i])</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>上面的代码第一次循环输出 5 个 0,因为 arr 数组执行的是默认初始化,数组元素是 int 类型,系统为 int 类型的数组元素初始化赋值为 0.</p>
+<h4 id="foreach循环"><code>foreach</code>循环</h4>
+<p>Java5 之后,Java 提供了一种更简单的循环:<code>foreach循环</code>,这种循环遍历数组和集合更加方便.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8"> (type item </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> array</span><span style="color:#F97583">|</span><span style="color:#E1E4E8">collection){</span></span>
+<span class="line"><span style="color:#6A737D">    //</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>使用<code>foreach</code>循环需要注意:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8">[] arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">5</span><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> item</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> arr){</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#E1E4E8">    item </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#E1E4E8">System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(arr[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]);</span></span></code></pre>
+<p>上例程序将输出</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#79B8FF">1</span></span>
+<span class="line"><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#79B8FF">2</span></span>
+<span class="line"><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#79B8FF">3</span></span>
+<span class="line"><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#79B8FF">4</span></span>
+<span class="line"><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#79B8FF">5</span></span>
+<span class="line"><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#79B8FF">1</span></span></code></pre>
+<p>由输出结果可以看出来,在 <code>foreach</code>循环中对数组元素进行赋值,结果导致不能正确的遍历数组元素.同时在循环中为改变的数组元素的值并没有真正改变数组元素,因为在 <code>foreach</code>中循环变量相当于一个临时变量,系统会把数组元素一次赋值给这个临时变量,而这个临时变量并不是数组元素,它只是保存了数组元素的值.因此要注意:<code>如果希望改变数组元素的值,则不能使用这种 foreach 循环</code>.</p>
+<h2 id="深入了解数组">深入了解数组</h2>
+<h3 id="jdk-中的-array">JDK 中的 <code>Array</code></h3>
+<p>查看 Java源码中的<code>Array</code>类可以发现它是个 <code>final class</code>, 其中方法如下:
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/951706-20200326003506393-472307678.png" alt="Arrays"></p>
+<p><code>Array</code>类中基本都是 <code>getXX</code> 和 <code>setXX</code> 方法,
+并且全部都为 <code>native</code> 方法.使用 <code>native</code>关键字说明这个方法是原生函数，也就是这个方法是用<code>C/C++</code>语言实现的，并且被编译成了DLL，由java去调用,因此我们可以将数组理解为是由计算机本地方法去实现的类,并不属于 Java.</p>
+<h3 id="数组的内存分布">数组的内存分布</h3>
+<p>数组是一种引用数据类型,数组的引用变量时存储在栈内存中的,而数组元素是在堆内存中,并且是连续存放的.这是为了能快速存取数组元素，因为只需要移动index（内部计算物理地址：<code>数组起始地址+index * 元素size大小</code>）就可以访问，而这是很快的 O(1)。</p>
+<p>在Java 内存模型中,数组对象被存储在堆(heap)内存中;如果引用该数组对象的变量是一个局部变量,那么它被存储在栈(stack)内存中.如下图所示:
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/951706-20200326003552496-1279006593.png" alt="数组的内存分布"></p>
+<p>如果需要访问上图堆内存中的数组元素,在程序中只能通过 p[index]的形式实现.也就是说,数组引用变量时访问堆内存中数组元素的根本方式.
+现有如下代码:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 定义并静态初始化数组</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8">[] a </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span><span style="color:#79B8FF">5</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">7</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">// 定义数组,使用动态初始化</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8">[] b </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"b 数组的长度为: "</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> b.length);</span></span>
+<span class="line"><span style="color:#6A737D">// 循环输出 a 数组的元素</span></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">, len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> a.length; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8"> ){</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(a[i]);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#6A737D">// 循环输出 b 数组的元素</span></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">, len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> b.length; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8"> ){</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(b[i]);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#6A737D">// 将 a 的值赋给 b,即将 b 的引用指向 a 引用指向的数组</span></span>
+<span class="line"><span style="color:#E1E4E8">b </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> a;</span></span>
+<span class="line"><span style="color:#6A737D">// 再次输出 b 数组的长度</span></span>
+<span class="line"><span style="color:#E1E4E8">System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"b 数组的长度为: "</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> b.length);</span></span>
+<span class="line"></span></code></pre>
+<p>运行上例代码,首先会输出 b 的长度为 4,然后输出 a,b 的各项元素,接着输出 b 的长度为 3.看起来数组的长度是可变的,其实这是一个假象.
+上例代码内存分析:</p>
+<ol>
+<li>
+<p>初始化 a,b 数组,在内存中产生了 4 块区域,栈中的引用变量 a,b 以及堆中的实际数组对象. 其中 a 引用的数组对象长度为 3, b 引用的数组长度为 4.
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/951706-20200326003632495-1700626784.png" alt="数组的内存分布"></p>
+</li>
+<li>
+<p>程序执行<code>b = a</code> 操作.系统会将 a 的值赋给 b,即将 a 引用的数组对象的内存地址赋给 b,此时 b 的值为 a 引用的数组对象的内存地址.
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/951706-20200326003650253-1864720497.png" alt="数组的内存分布"></p>
+</li>
+</ol>
+<p>从上可以看出,程序执行 <code>b = a</code> 之后,b 之前引用的数组对象长度并没有发生任何改变,而 b 的值变成了 a 引用的数组对象的地址,此时 b 数组的长度即为 a 数组的长度 3.</p>
+<blockquote>
+<p>需要注意的是数组元素的内存空间是连续的，是指</p>
+<ol>
+<li>如果数组元素是原始类型，那么数组元素存放的就是原始类型的值，他们是连续存放的</li>
+<li>如果数组元素是对象，那么数组元素就是存放引用了，数组元素是连续存放的，而引用的对象可能在另外的地方，与数组元素可能相隔很远，即不连续。</li>
+</ol>
+</blockquote>
+<h3 id="多维数组">多维数组</h3>
+<p>Java 提供了支持多维数组的语法,但是从数组底层的运行机制上来看,并不存在多维数组.
+多维数组的定语语法为</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">type[][] arr </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> type[length1][length2]</span></span></code></pre>
+<p><code>length2</code>可动态创建.
+二维数组本质就是一位数组中的每个元素都是一个一维数组. 如上<code>length2</code>给出了值,则初始化了一维数组中的每个元素都是一个长度为<code>length2</code>的一维数组.其内存模型为:
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/951706-20200326003710848-1203499712.png" alt="二维数组内存分布"></p>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885509/"><span>上一篇</span><strong>原码、补码、反码</strong></a> <a href="/post/164885660/"><span>下一篇</span><strong>UML 类图</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885530/"> <span>2022/04/02 · 基础知识</span> <strong>说一说我理解的Java</strong> </a><a href="/post/164885509/"> <span>2020/08/03 · 基础知识</span> <strong>原码、补码、反码</strong> </a><a href="/post/164885510/"> <span>2020/08/02 · 基础知识</span> <strong>Java基础 - 数据类型和运算符</strong> </a> </div> </section> </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-2" href="#初识数组">初识数组</a><a class="toc-depth-2" href="#数组的初始化">数组的初始化</a><a class="toc-depth-3" href="#定义数组变量">定义数组变量</a><a class="toc-depth-3" href="#初始化">初始化</a><a class="toc-depth-2" href="#数组的访问">数组的访问</a><a class="toc-depth-3" href="#数组元素读取赋值">数组元素读取、赋值</a><a class="toc-depth-3" href="#数组的遍历">数组的遍历</a><a class="toc-depth-2" href="#深入了解数组">深入了解数组</a><a class="toc-depth-3" href="#jdk-中的-array">JDK 中的 Array</a><a class="toc-depth-3" href="#数组的内存分布">数组的内存分布</a><a class="toc-depth-3" href="#多维数组">多维数组</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

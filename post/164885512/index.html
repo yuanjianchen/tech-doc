@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="知识体系结构"><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>集合框架总览 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/集合框架/">集合框架</a> <span>2022/04/01</span>  <span>2 分钟阅读</span> </div> <h1>集合框架总览</h1> <p>知识体系结构</p> <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/Java-集合/">
+#Java 集合 </a> </div> </header> <div class="prose" data-pagefind-body>  <h2 id="知识体系结构">知识体系结构</h2>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/2022/04/java_collections_overview.png" alt="java_collections_overview"></p>
+<h2 id="介绍">介绍</h2>
+<p>容器，就是可以容纳其他Java对象的对象。*Java Collections Framework(JCF)*为Java开发者提供了通用的容器，其始于JDK 1.2，优点是:</p>
+<ul>
+<li>降低编程难度</li>
+<li>提高程序性能</li>
+<li>提高API间的互操作性</li>
+<li>降低学习难度</li>
+<li>降低设计和实现相关API的难度</li>
+<li>增加程序的重用性</li>
+</ul>
+<p>Java容器里只能放对象，对于基本类型(int, long, float, double等)，需要将其包装成对象类型后(Integer, Long, Float, Double等)才能放到容器里。很多时候拆包装和解包装能够自动完成。这虽然会导致额外的性能和空间开销，但简化了设计和编程。</p>
+<h2 id="collection">Collection</h2>
+<blockquote>
+<p>容器主要包括 Collection 和 Map 两种，Collection 存储着对象的集合，而 Map 存储着键值对(两个对象)的映射表。</p>
+</blockquote>
+<h3 id="set">Set</h3>
+<h4 id="treeset">TreeSet</h4>
+<p>基于红黑树实现，支持有序性操作，例如根据一个范围查找元素的操作。但是查找效率不如 HashSet，HashSet 查找的时间复杂度为 O(1)，TreeSet 则为 O(logN)。</p>
+<h4 id="hashset">HashSet</h4>
+<p>基于哈希表实现，支持快速查找，但不支持有序性操作。并且失去了元素的插入顺序信息，也就是说使用 Iterator 遍历 HashSet 得到的结果是不确定的。</p>
+<h4 id="linkedhashset">LinkedHashSet</h4>
+<p>具有 HashSet 的查找效率，且内部使用双向链表维护元素的插入顺序。</p>
+<h3 id="list">List</h3>
+<h4 id="arraylist">ArrayList</h4>
+<p>基于动态数组实现，支持随机访问。</p>
+<h4 id="vector">Vector</h4>
+<p>和 ArrayList 类似，但它是线程安全的。</p>
+<h4 id="linkedlist">LinkedList</h4>
+<p>基于双向链表实现，只能顺序访问，但是可以快速地在链表中间插入和删除元素。不仅如此，LinkedList 还可以用作栈、队列和双向队列。</p>
+<h3 id="queue">Queue</h3>
+<h4 id="linkedlist-1">LinkedList</h4>
+<p>可以用它来实现双向队列。</p>
+<h4 id="priorityqueue">PriorityQueue</h4>
+<p>基于堆结构实现，可以用它来实现优先队列。</p>
+<h2 id="map">Map</h2>
+<h3 id="treemap">TreeMap</h3>
+<p>基于红黑树实现。</p>
+<h3 id="hashmap">HashMap</h3>
+<p>基于哈希表实现。</p>
+<h3 id="hashtable">HashTable</h3>
+<p>和 HashMap 类似，但它是线程安全的，这意味着同一时刻多个线程可以同时写入 HashTable 并且不会导致数据不一致。它是遗留类，不应该去使用它。现在可以使用 ConcurrentHashMap 来支持线程安全，并且 ConcurrentHashMap 的效率会更高，因为 ConcurrentHashMap 引入了分段锁。</p>
+<h3 id="linkedhashmap">LinkedHashMap</h3>
+<p>使用双向链表来维护元素的顺序，顺序为插入顺序或者最近最少使用(LRU)顺序。</p>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885658/"><span>上一篇</span><strong>概述</strong></a> <a href="/post/164885534/"><span>下一篇</span><strong>MySQL数据类型</strong></a> </nav>  </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-2" href="#知识体系结构">知识体系结构</a><a class="toc-depth-2" href="#介绍">介绍</a><a class="toc-depth-2" href="#collection">Collection</a><a class="toc-depth-3" href="#set">Set</a><a class="toc-depth-3" href="#list">List</a><a class="toc-depth-3" href="#queue">Queue</a><a class="toc-depth-2" href="#map">Map</a><a class="toc-depth-3" href="#treemap">TreeMap</a><a class="toc-depth-3" href="#hashmap">HashMap</a><a class="toc-depth-3" href="#hashtable">HashTable</a><a class="toc-depth-3" href="#linkedhashmap">LinkedHashMap</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

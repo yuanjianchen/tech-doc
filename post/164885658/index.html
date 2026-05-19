@@ -1,0 +1,317 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="什么是数据结构"><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>概述 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/数据结构教程/">数据结构教程</a> <span>2021/12/30</span>  <span>12 分钟阅读</span> </div> <h1>概述</h1> <p>什么是数据结构</p> <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/数据结构/">
+#数据结构 </a> </div> </header> <div class="prose" data-pagefind-body>  <h1 id="什么是数据结构">什么是数据结构</h1>
+<h2 id="数据">数据</h2>
+<p>数据是描述客观世界中的数字、字符以及一切能输入到计算机中，并且能够被计算机程序处理的符号集合。是信息的载体。</p>
+<h2 id="数据元素">数据元素</h2>
+<p>数据元素是能够独立、完整的描述问题世界中的实体的最小数据单位，它是数据这个集合中一个个的元素。数据元素也成为数据节点，或者简称为节点。</p>
+<h2 id="数据对象">数据对象</h2>
+<p>一个数据对象被定义为具有相同性质的数据元素的集合。它是数据这个集合的一个子集。</p>
+<h2 id="结构">结构</h2>
+<p>数据元素之间存在这某种联系，这种联系称为结构。数据结构是具有某种结构的数据的集合。</p>
+<p>数据结构的一个形式化的描述。数据结构是一个二元组</p>
+<p><code>Data-Structure=(D,R)</code></p>
+<p>其中 D 是数据元素的有限集合，R 是 D 上关系的集合。</p>
+<h3 id="逻辑结构">逻辑结构</h3>
+<p>数据元素之间的逻辑关系，称为数据的逻辑结构。</p>
+<h4 id="集合结构">集合结构</h4>
+<p>集合结构中的数据元素除了同属于一个集合外，它们之间没有其他关系。各个数据元素是“平等”的，它们的共同属性是“同属于一个集合”。</p>
+<h4 id="线性结构">线性结构</h4>
+<p>线性结构中的数据元素是一对一的关系。除了第一个元素和最后一个元素之外，其余元素有且仅有一个前驱元素及有且仅有一个后继元素，即所有的元素依次排列在一个线性序列中。</p>
+<h4 id="树形结构">树形结构</h4>
+<p>树形结构中的数据元素之间存在一种一对多的层次关系</p>
+<h4 id="图形结构">图形结构</h4>
+<p>图形结构的数据元素是多对多的关系</p>
+<h3 id="物理结构">物理结构</h3>
+<p>数据结构在计算机中的表示称为数据的物理结构，也称为数据的存储结构。</p>
+<h4 id="顺序储存结构">顺序储存结构</h4>
+<p>在计算机储存器中用一片连续的储存单元（储存单元之前不能有间隔）依次存放数据元素信息，数据元素的逻辑关系通过数据元素的存储地址直接反应。</p>
+<p>顺序存储结构的优点是简单，易理解，并且实际占用最少的存储空间；
+缺点是需要占用一片地址连续的整块空间，并且存储分配要事先进行；另外，对于一些操作的时间效率较低也是这种存储结构的主要缺陷之一。</p>
+<h4 id="链式结构">链式结构</h4>
+<p>链式存储结构是指在计算机存储器中用一片地址任意的（连续的或者不连续的）存储单元依次存放数据元素的信息，一般称每个数据元素占用的若干存储单元的组合为一个链结点。
+每个链结点中不仅要存放一个数据元素的数据信息，还要存放一个指出这个元素在逻辑关系中的直接后继元素所在链结点的地址，该地址被称为指针。这就是说，数据元素之间的逻辑关系通过指针间接地反映。由于不要求存储空间地址连续，因此，逻辑上相邻的数据元素在物理上不一定相邻。链式存储结构也称链表结构，简称链表。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/2021/12/202112292354image-20211229235446067.png" alt="连接结构"></p>
+<p>链式存储结构的优点是存储空间不必事先分配，在需要存储空间时可以临时申请，不会造成存储空间的浪费。所以像插人和删除这样操作的时间效率采用链式存储结构远比采用顺序存储结构要高。但在这种存储结构中，不仅数据元素本身的数据信息需要占用存储空间，而且指针也有存储空间的开销，因此，从这一点来说，链式存储结构要比顺序存储结构的空间开销大。</p>
+<blockquote>
+<p>数据的逻辑结构可以独立于数据的存储结构，这是因为数据的逻辑结构设计是在数据分析阶段进行的，而数据的存储结构设计是在数据的设计阶段进行的。反之，数据的存储结构不能独立于数据的逻辑结构，这是因为数据的存储结构是数据的逻辑结构在计算机存储中的映像。</p>
+</blockquote>
+<h1 id="算法">算法</h1>
+<p>算法是用来解决某个课题的一些指令的集合。简单来说，算法就是解决问题的方法</p>
+<h2 id="算法的基本特征">算法的基本特征：</h2>
+<ul>
+<li>输入</li>
+<li>输出</li>
+<li>有穷性</li>
+<li>确定性</li>
+<li>有效性</li>
+</ul>
+<h2 id="算法效率的度量方法">算法效率的度量方法</h2>
+<h3 id="事后统计方法">事后统计方法</h3>
+<p>这种方法主要是通过设计好的测试程序和数据，利用计算机计时器对不同算法编制的程序的运行时间进行比较，从而确定算法效率的高低。
+这种方法显然是有很大缺陷的：</p>
+<ul>
+<li>必须依据算法事先编制好程序，这通常需要花费大量的时间和精力。如果编制出来发现它根本是很糟糕的算法，不是竹篮打水一场空吗？</li>
+<li>时间的比较依赖计算机硬件和软件等环境因素，有时会掩盖算法本身的优劣。要知道，现在的一台四核处理器的计算机，跟当年286、386、486等老爷爷辈的机器相比，在处理算法的运算速度上，是不能相提并论的；而所用的操作系统、编译器、运行框架等软件的不同，也可以影响它们的结果；就算是同一台机器，CPU使用率和内存占用情况不一样，也会造成细微的差异。</li>
+<li>算法的测试数据设计困难，并且程序的运行时间往往还与测试数据的规模有很大关系，效率高的算法在小的测试数据面前往往得不到体现。比如10个数字的排序，不管用什么算法，差异几乎是零。而如果有一百万个随机数字排序，那不同算法的差异就非常大了。那么我们为了比较算法，到底用多少数据来测试，这是很难判断的问题</li>
+</ul>
+<h3 id="事前分析估算方法">事前分析估算方法</h3>
+<p>在计算机程序编制前，依据统计方法对算法进行估算。</p>
+<h3 id="时间复杂度">时间复杂度</h3>
+<p>在进行算法分析时，语句总的执行次数T(n)是关于问题规模n的函数，进而分析T(n)随n的变化情况并确定T(n)的数量级。算法的时间复杂度，也就是算法的时间量度，记作：T(n)=O(f(n))。它表示随问题规模n的增大，算法执行时间的增长率和f(n)的增长率相同，称作算法的渐近时间复杂度，简称为时间复杂度。其中f(n)是问题规模n的某个函数。</p>
+<p>这样用大写O( )来体现算法时间复杂度的记法，我们称之为大O记法。</p>
+<h3 id="空间复杂度">空间复杂度</h3>
+<p>算法的空间复杂度通过计算算法所需的存储空间实现，算法空间复杂度的计算公式记作：S(n)=O(f(n))，其中，n为问题的规模，f(n)为语句关于n所占存储空间的函数。</p>
+<p>因此，数据结构课程所要研究的主要内容可以简要地归纳为以下3个方面。</p>
+<ol>
+<li>研究数据元素之间固有的客观联系（逻辑结构）。</li>
+<li>研究数据在计算机内部的存储方法（存储结构）。</li>
+<li>研究在数据的各种结构（逻辑的和物理的）的基础上如何对数据实施有效的操作或处理（算法）。</li>
+</ol>
+<h1 id="课后题">课后题</h1>
+<h2 id="选择题">选择题</h2>
+<ol>
+<li>
+<p>以下关于数据结构的叙述中,错误的是</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A. 数据结构涉及数据的逻辑结构存储结构和施加其上的操作3个方面</li>
+<li class="task-list-item"><input type="checkbox" disabled> B. 施加在数据结构上的操作的具体实现与数据的存储结构有关</li>
+<li class="task-list-item"><input type="checkbox" disabled> C. 定义数据的逻辑结构时可以不考虑数据的存储结构</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==D. 数据结构相同,对应的存储结构也必然相同==</li>
+</ul>
+</li>
+<li>
+<p>以下关于数据结构的叙述中,==正确==的是</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.数据的存储结构独立于该数据的逻辑结构</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==B.数据的逻辑结构独立于该数据的存储结构==</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.数据的逻辑结构唯一地决定了该数据的存储结构</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.数据结构仅由数据的逻辑结构和存储结构决定</li>
+</ul>
+</li>
+<li>
+<p>数据结构研究的内容不涉及</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.数据如何组织</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.数据如何存储</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==C.采用何种语言描述算法==</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.数据的运算如何实现</li>
+</ul>
+</li>
+<li>
+<p>在数据结构中,数据元素之间存在的逻辑关系称为</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> ==A.数据的逻辑结构==</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.数据的存储结构</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.对数据实施的基本操作</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.对数据实施的算法</li>
+</ul>
+</li>
+<li>
+<p>从逻辑上可以把数据结构分为</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.动态结构和静态结构</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==B.线性结构和非线性结构==</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.内部结构和外部结构</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.紧凑结构和非紧凑结构</li>
+</ul>
+</li>
+<li>
+<p>数据的存储结构包括</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.顺序存储结构和链式存储结构</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.顺序存储结构、链式存储结构和索引存储结构</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.顺序存储结构、链式存储结构和散列存储结构</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==D.顺序存储结构、链式存储结构、索引存储结构和散列存储结构==</li>
+</ul>
+</li>
+<li>
+<p>描述数据的存储结构时不需要知道</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> ==A.计算机内存芯片的有关参数==</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.数据元素如何构成</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.数据元素的类型</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.使用何种算法描述语言</li>
+</ul>
+</li>
+<li>
+<p>在选择何种存储结构时,一般不考虑</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.对数据可以实施哪些操作</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.所用编程语言实现这种结构是否方便</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==C.数据元素的值如何==</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.数据元素的数目多少</li>
+</ul>
+</li>
+<li>
+<p>若数据采用顺序存储结构,则要求</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.存储的是属于线性结构的数据</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.根据数据元素值的大小有序地存放各数据元素</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.按照存储单元地址由低到高的顺序存放各数据元素</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==D.用地址连续的存储空间依次存储元素,并能隐含地表示元素之间的逻辑关系==</li>
+</ul>
+</li>
+<li>
+<p>若数据采用链式存储结构,则要求</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> ==A.每个链结点占用一片地址连续的存储空间==</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.所有的链结点占用一片地址连续的存储空间</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.链结点的最后那个域一定是指针域</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.每个链结点有多少个后继结点,链结点中就应该设置多少个指针域</li>
+</ul>
+</li>
+<li>
+<p>对于索引存储结构而言,</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> ==A.它是利用数据元素的索引关系来确定数据元素存储位置的一种存储结构==</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.它不一定包括索引表与基本数据两个部分</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.索引表中只包括数据元素本身</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.索引表中的索引项的排列是任意的</li>
+</ul>
+</li>
+<li>
+<p>对于散列存储结构而言,</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.必须使用一对一的散列函数</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.它是根据元素的种类确定元素的存储位置</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==C.它是根据函数关系确定元素的存储位置的一种存储结构==</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.相邻存储单元中存放的元素,其值一定是连续的</li>
+</ul>
+</li>
+<li>
+<p>算法指的是</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.用计算机语言描述的程序</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.解决问题的计算方法</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.对数据进行的查找或者排序的方法</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==D.解决问题的一系列有限的基本步骤==</li>
+</ul>
+</li>
+<li>
+<p>下面关于算法与程序的叙述中,错误的是</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.程序是用计算机语言表达的算法</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.流程图是一种图形化的算法</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.程序就是算法,但算法不一定是程序</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==D.算法与程序都独立于具体的计算机与具体的程序设计语言==</li>
+</ul>
+</li>
+<li>
+<p>算法的时间复杂度主要与</p>
+<ul class="contains-task-list">
+<li class="task-list-item">
+<p><input type="checkbox" disabled> A.编译程序的质量有关</p>
+</li>
+<li class="task-list-item">
+<p><input type="checkbox" disabled> B.程序设计语言有关</p>
+</li>
+<li class="task-list-item">
+<p><input type="checkbox" checked disabled> ==C.所解决的问题的规模有关==</p>
+</li>
+<li class="task-list-item">
+<p><input type="checkbox" disabled> D.计算机的硬件性能有关</p>
+</li>
+</ul>
+</li>
+<li>
+<p>对算法进行分析的前提是</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> ==A.算法是正确的==</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.算法尽可能简单</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.算法运行的时间要短</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.算法占用的空间要少</li>
+</ul>
+</li>
+<li>
+<p>算法分析的目的是</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.研究算法中的输入与输出之间的关系</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.找出数据结构的合理性</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==C.分析算法的效率,以求改进算法==</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.分析算法的可读性和简明性</li>
+</ul>
+</li>
+<li>
+<p>算法分析的主要任务是</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.分析算法是否具有较好的可读性</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==B.分析算法的执行时间与问题规模之间的关系==</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.分析算法中是否存在语法错误</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.分析算法的功能是否符合设计要求</li>
+</ul>
+</li>
+<li>
+<p>计算算法的时间复杂度是属于一种</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.事前统计的方法</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==B.事前分析估算的方法==</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.事后统计的方法</li>
+<li class="task-list-item"><input type="checkbox" disabled> D.事后分析估算的方法</li>
+</ul>
+</li>
+<li>
+<p>若某算法的时间复杂度采用大O形式表示是O(n^2^),则表明该算法的</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> A.问题规模是n^2^</li>
+<li class="task-list-item"><input type="checkbox" disabled> B.执行时间等于n^2^</li>
+<li class="task-list-item"><input type="checkbox" disabled> C.问题规模与n^2^成正比</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> ==D.执行时间与n^2^成正比==</li>
+</ul>
+</li>
+</ol>
+<h2 id="填空题">填空题</h2>
+<ol>
+<li>“数据结构”课程研究的主要内容包括 <u>==逻辑结构==</u>、<u>==存储结构==</u> 和 <u>==算法==</u> 这3个方面。</li>
+<li>数据的逻辑结构是指<u>==数据元素在客观世界中存在的逻辑关系==</u>，而存储结构是指<u>==具有某种逻辑关系的数据在计算机存储器中的存储映像==</u>。</li>
+<li>数据的逻辑结构可以分为<u>==线性结构==</u>和<u>==非线性结构==</u>两大类。</li>
+<li>线性结构是指结构中数据元素之间存在的逻辑关系是 <u>==一对一==</u>的关系。</li>
+<li>非线性结构是指结构中数据元素之间存在的逻辑关系是 <u>==一对多==</u>或者 <u>==多对一==</u>,甚至是<u>==多对多==</u>的关系。</li>
+<li>逻辑上相邻的数据元素在物理位置上也相邻是 <u>==顺序==</u>存储结构的特点之一。</li>
+<li>逻辑上相邻的数据元素在物理位置上不要求相邻是 <u>==链式==</u>存储结构的特点之一。</li>
+<li>顺序存储结构利用数据元素的 <u>==存储地址==</u>直接地反映数据元素之间的逻辑结构</li>
+<li>链式存储结构利用链结点的 <u>==指针==</u>间接地反映数据元素之间的逻辑结构。</li>
+<li>若某算法的功能是完成对n个数据元素的处理,所需要的时间是T(n)=100nlog<del>2</del>n+200n+300,则该算法的时间复杂度用大O形式表示为 <u>==O(nlog<del>2</del>n)==</u></li>
+</ol>
+<h2 id="简答题">简答题</h2>
+<ol>
+<li>
+<p>通常说,数据结构可以表示为一个二元组(D,R),其中DR分别代表什么?</p>
+<p>D 代表数据元素的又穷集合。R 代表 D 上关系的集合。</p>
+</li>
+<li>
+<p>通常情况下,数据的结构包括哪两种结构?</p>
+<p>数据的逻辑结构和数据的存储结构。</p>
+</li>
+<li>
+<p>数据的逻辑结构和数据的存储结构之间的关系是什么?</p>
+<p>数据的逻辑结构面向所解决的问题，反映了数据内部的构成方式；而数据的存储结构面向计算机，目标是将数据及其逻辑关系存储到计算机存储器中。一般情况下，一种逻辑结构可以采用多种存储结构来存储，而采用不同的存储结构，其对数据处理的效率往往不同。</p>
+</li>
+<li>
+<p>数据的逻辑结构是否可以独立于数据的存储结构来考虑?反之,数据的存储结构是否可以独立于数据的逻辑结构来考虑?</p>
+<p>数据的逻辑结构可以独立于数据的存储结构，这是因为数据的逻辑结构设计是在数据分析阶段进行的，而数据的存储结构设计是在数据的设计阶段进行的。反之，数据的存储结构不能独立于数据的逻辑结构，这是因为数据的存储结构是数据的逻辑结构在计算机存储中的映像。</p>
+</li>
+<li>
+<p>具有某种逻辑结构数据在不同的存储结构下对其实施某种操作,其操作的时间效率可能不同。这种说法正确吗?请举例说明。</p>
+<p>这种说法正确。例如在长度为 n 的线性表中进行插入或者删除操作，当线性表采用顺序存储结构时，需要平均移动奖金一半的数据元素的位置，操作的时间复杂度为 O(n)，而在链式存储结构下，则不需要移动元素数据的位置，操作时间复杂度为 O(1)，与线性表的长度无关。</p>
+</li>
+<li>
+<p>算法的基本特性之一是由算法的外部提供n≥0个有限量作为算法的输入。这里的0个输入表示什么意思?</p>
+<p>这里的 0 个输入是指算法的输入不是通过键盘或者其他设备输入的，而是由算法的内部确定初始条件，或者通过算法内部诸如赋值语句等方式给出所需要的变量的初始值，被认为是一种特殊的输入。因此，在某些特殊情况下，一个算法可以没有输入。</p>
+</li>
+<li>
+<p>“一个算法是正确的”是什么意思?</p>
+<p>是指当输入一组合理的数据时，能够在有限的运行时间内得出正确的结果，对于不合理的输入数据，能够给出相应的警告提示信息。</p>
+</li>
+<li>
+<p>衡量一个算法质量优劣的基本标准是什么?</p>
+<p>衡量一个算法优劣的基本标准通常包括 5 个方面，分别是算法的正确性，算法的易读性，算法的健壮性，算法的可移植性及算法的时空效率。尤其第 5 个方面是要重点考虑的。</p>
+</li>
+<li>
+<p>影响一个算法的时间效率的主要因素有哪些?</p>
+<p>影响一个算法的时间效率的主要因素包括两个方面。其中解决问题的规模大小是影响算法时间效率的重要因素之一。两一个影响算法时间效率的重要原因是算法中执行基本操作的次数。</p>
+</li>
+<li>
+<p>已知在同一运行环境下实现相同功能的两个算法A和B,其中算法A的时间复杂度为O(2^n),算法B的时间复杂度为O(n^2),仅就时间复杂度而言,哪一个算法更好?</p>
+<p>分别对算法 A 和算法 B 的时间复杂度取对数，得到 nlog2 和 2logn，显然，当 n&#x3C;4时，算法 A 的时间复杂度不大于算法 B 的时间复杂度；当 n=4时，两个算法的时间复杂度相同；当 n>4 时，算法 B 要好于算法 A。</p>
+</li>
+</ol>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885489/"><span>上一篇</span><strong>八、指针</strong></a> <a href="/post/164885512/"><span>下一篇</span><strong>集合框架总览</strong></a> </nav>  </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-2" href="#数据">数据</a><a class="toc-depth-2" href="#数据元素">数据元素</a><a class="toc-depth-2" href="#数据对象">数据对象</a><a class="toc-depth-2" href="#结构">结构</a><a class="toc-depth-3" href="#逻辑结构">逻辑结构</a><a class="toc-depth-3" href="#物理结构">物理结构</a><a class="toc-depth-2" href="#算法的基本特征">算法的基本特征：</a><a class="toc-depth-2" href="#算法效率的度量方法">算法效率的度量方法</a><a class="toc-depth-3" href="#事后统计方法">事后统计方法</a><a class="toc-depth-3" href="#事前分析估算方法">事前分析估算方法</a><a class="toc-depth-3" href="#时间复杂度">时间复杂度</a><a class="toc-depth-3" href="#空间复杂度">空间复杂度</a><a class="toc-depth-2" href="#选择题">选择题</a><a class="toc-depth-2" href="#填空题">填空题</a><a class="toc-depth-2" href="#简答题">简答题</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

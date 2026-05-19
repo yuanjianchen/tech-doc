@@ -1,0 +1,146 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="工厂方法模式是类的创建模式，又叫虚拟构造器（Virtual Constructor）模式，或者多态性工厂模式。定义一个创建对象的接口，让子类决定实例化哪一个类。工厂方法使一个类的实例化延迟到其子类。"><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>设计模式 - 工厂方法模式 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/设计模式/">设计模式</a> <span>2020/08/03</span>  <span>5 分钟阅读</span> </div> <h1>设计模式 - 工厂方法模式</h1>  <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/设计模式/">
+#设计模式 </a> </div> </header> <div class="prose" data-pagefind-body>  <h2 id="定义">定义</h2>
+<ul>
+<li>工厂方法模式是类的创建模式，又叫虚拟构造器（Virtual Constructor）模式，或者多态性工厂模式。</li>
+<li>定义一个创建对象的接口，让子类决定实例化哪一个类。工厂方法使一个类的实例化延迟到其子类。</li>
+</ul>
+<h2 id="结构">结构</h2>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803145209257.png" alt="工厂方法"></p>
+<p>工厂方法包含了一下角色</p>
+<ul>
+<li><strong>Product：抽象产品</strong></li>
+<li><strong>ConcreteProduct：具象产品</strong></li>
+<li><strong>Factory：抽象工厂</strong></li>
+<li><strong>ConcreteFactory：具象工厂</strong></li>
+</ul>
+<h2 id="场景示例">场景示例</h2>
+<p>还是拿售卖机票举例，我们之前用简单工厂实现了不同供应商的下单逻辑，但是随着业务的不断扩大，我们对接的供应商越来越多，这样就会造成每次对接一个供应商都会在工厂类中添加分支，对工厂类进行修改，这就违反了<code>开闭原则</code>，所以现在我们用工厂方法来修改一下。
+<strong>Factory</strong>  代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> interface</span><span style="color:#B392F0"> Factory</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    Product </span><span style="color:#B392F0">createProduct</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> AFactory</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Factory</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Product </span><span style="color:#B392F0">createProduct</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> AProduct</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> BFactory</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Factory</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Product </span><span style="color:#B392F0">createProduct</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> BProduct</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> CFactory</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Factory</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Product </span><span style="color:#B392F0">createProduct</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> CProdut</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#E1E4E8">... D</span></span>
+<span class="line"><span style="color:#E1E4E8">... E</span></span></code></pre>
+<p><strong>Product</strong>代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> interface</span><span style="color:#B392F0"> Product</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    void</span><span style="color:#B392F0"> createOrder</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> AProduct</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Product</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> createOrder</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"供应商A：下单操作"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> BProduct</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Product</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> createOrder</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"供应商B：下单操作"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> CProdut</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Product</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> createOrder</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"供应商B：下单操作"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#E1E4E8">... D</span></span>
+<span class="line"><span style="color:#E1E4E8">... E</span></span></code></pre>
+<p><strong>Client</strong> 代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> Client</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        Factory aFactory </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> AFactory</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        Product aProduct </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> aFactory.</span><span style="color:#B392F0">createProduct</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        aProduct.</span><span style="color:#B392F0">createOrder</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        Factory bFactory </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> BFactory</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        Product bProduct </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> bFactory.</span><span style="color:#B392F0">createProduct</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        bProduct.</span><span style="color:#B392F0">createOrder</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>输出<code>供应商A：下单操作 供应商B：下单操作</code>
+以上就是一个简单的工厂方法的实现。即使在添加新的供应商，我们只要创建新的供应商工厂以及其实现就可以了，这样对我们的整个的工厂和产品体系都没有发生修改，而只是扩展了变化，这就完全符合了<code>开放-闭合</code>原则。如果我们的需求发生了变化，要同时支持单程、往返的下单，只要我们在每一个供应商作为一个简单工厂，创建出支持单程、往返的两种具象的产品就可以了。但是我们仔细观察就能发现，<strong>工厂方法模式实现时，客户端需要决定实例化哪一个工厂，选择判断的问题还是存在的，也就是说，工厂方法把简单工厂的内部逻辑判断移到了客户端代码来运行，你想要什么功能，本来是去修改工厂的，但是现在是去修改了客户端！</strong></p>
+<blockquote>
+<p>此例只是针对每个工厂只生成一个具象产品类，至于一个工厂生成多个具象产品类可将每个工厂改造成简单工厂，具体可参考<code>披萨店</code>。
+消除分支判断可以利用<code>反射</code>的方法。（将在抽象工厂章节统一列出）</p>
+</blockquote>
+<h2 id="优点">优点</h2>
+<ul>
+<li>
+<p>在工厂方法模式中，工厂方法用来创建客户端需要的产品，同时还向客户端隐藏了哪种具体产品类将被实例化这一细节，客户端只用关心产品对应的工厂，无需关心创建细节，甚至无需知道具体产品的类名。</p>
+</li>
+<li>
+<p><code>面向接口编程</code>，基于工厂角色和产品角色的多态性设计是工厂方法模式的关键。它能够使工厂可以自主确定创建何种产品对象，而如何创建这个对象的细节则完全封装在具体工厂内部。工厂方法模式之所以又被称为多态工厂模式，是因为所有的具体工厂类都具有同一抽象父类。</p>
+</li>
+<li>
+<p>遵循<code>开放-闭合</code>原则，在系统中新增加一个产品时，不用更改抽象工厂以及抽象产品，也不用对客户端以及具象工厂和产品做修改，而只要添加一个具体工厂和具体产品就可以了。</p>
+</li>
+</ul>
+<h2 id="缺点">缺点</h2>
+<ul>
+<li>
+<p>在添加新产品时，需要编写新的具体产品类，而且还要提供与之对应的具体工厂类，系统中类的个数将成对增加，在一定程度上增加了系统的复杂度，有更多的类需要编译和运行，会给系统带来一些额外的开销。</p>
+</li>
+<li>
+<p>由于考虑到系统的可扩展性，需要引入抽象层，在客户端代码中均使用抽象层进行定义，增加了系统的抽象性和理解难度，且在实现时可能需要用到DOM、反射等技术，增加了系统的实现难度。</p>
+</li>
+</ul>
+<h2 id="应用场景">应用场景</h2>
+<ul>
+<li>
+<p>一个类不知道它所需要的对象的类：在工厂方法模式中，客户端不需要知道具体产品类的类名，只需要知道所对应的工厂即可，具体的产品对象由具体工厂类创建；客户端需要知道创建具体产品的工厂类。</p>
+</li>
+<li>
+<p>一个类通过其子类来指定创建哪个对象：在工厂方法模式中，对于抽象工厂类只需要提供一个创建产品的接口，而由其子类来确定具体要创建的对象，利用面向对象的多态性和里氏代换原则，在程序运行时，子类对象将覆盖父类对象，从而使得系统更容易扩展。</p>
+</li>
+<li>
+<p>将创建对象的任务委托给多个工厂子类中的某一个，客户端在使用时可以无须关心是哪一个工厂子类创建产品子类，需要时再动态指定，可将具体工厂类的类名存储在配置文件或数据库中。</p>
+</li>
+</ul>
+<blockquote>
+<p>扩展</p>
+<ul>
+<li>使用多个工厂方法，可在抽象工厂中定义多个工厂方法，从而使具体工厂实现不同的工厂方法，哲学工厂方法包含不同的逻辑，创建不同的产品（抽象工厂）</li>
+<li>产品对象的重复使用：
+（1）工厂对象将已经创建过的产品保存到一个集合（如数组、List等）中，然后根据客户对产品的请求，对集合进行查询。如果有满足要求的产品对象，就直接将该产品返回客户端；如果集合中没有这样的产品对象，那么就创建一个新的满足要求的产品对象，然后将这个对象在增加到集合中，再返回给客户端。
+（2）Spring单例模式的使用</li>
+<li>多态性的丧失和模式的退化：如果工厂仅仅返回一个具体产品对象，便违背了工厂方法的用意，发生退化，此时就不再是工厂方法模式了。一般来说，工厂对象应当有一个抽象的父类型，如果工厂等级结构中只有一个具体工厂类的话，抽象工厂就可以省略，也将发生了退化。当只有一个具体工厂，在具体工厂中可以创建所有的产品对象，并且工厂方法设计为静态方法时，工厂方法模式就退化成简单工厂模式。(本例就可以简化为简单工厂模式)</li>
+</ul>
+</blockquote>
+<h2 id="总结">总结</h2>
+<ul>
+<li>
+<p>工厂方法模式又称为<code>工厂模式</code>，<code>虚拟构造器</code>模式。工厂方法中父类负责定义创建产品的统一接口，工厂子类负责生成具体的产品类。将产品的实例化操作延迟到子类进行，由子类决定实例化哪一个具体的产品类。</p>
+</li>
+<li>
+<p>工厂方法模式包含四个角色：<strong>抽象工厂</strong>、<strong>具象工厂</strong>、<strong>抽象产品</strong>、<strong>具象产品</strong></p>
+</li>
+<li>
+<p>工厂方法模式是简单工厂的进一步的抽象和推广，它们都是集中封装了对象的创建，使得更换对象时不需要做大的改动就可以实现，降低了客户端程序与产品对象的耦合。但是由于工厂方法模式使用了多态性，工厂方法模式保持了简单工厂模式的有点，而且克服了它的缺点。</p>
+</li>
+<li>
+<p>工厂方法模式的主要优点是增加新的产品类时无须修改现有系统，并封装了产品对象的创建细节，系统具有良好的灵活性和可扩展性；其缺点在于增加新产品的同时需要增加新的工厂，导致系统类的个数成对增加，在一定程度上增加了系统的复杂性。</p>
+</li>
+<li>
+<p>工厂方法模式适用情况包括：一个类不知道它所需要的对象的类；一个类通过其子类来指定创建哪个对象；将创建对象的任务委托给多个工厂子类中的某一个，客户端在使用时可以无须关心是哪一个工厂子类创建产品子类，需要时再动态指定。</p>
+</li>
+</ul>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885663/"><span>上一篇</span><strong>设计模式 - 工厂三兄弟</strong></a> <a href="/post/164885661/"><span>下一篇</span><strong>设计模式 - 单例模式</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885719/"> <span>2020/08/03 · 设计模式</span> <strong>设计模式 - 简单工厂模式</strong> </a><a href="/post/164885661/"> <span>2020/08/03 · 设计模式</span> <strong>设计模式 - 单例模式</strong> </a><a href="/post/164885663/"> <span>2020/08/03 · 设计模式</span> <strong>设计模式 - 工厂三兄弟</strong> </a> </div> </section> </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-2" href="#定义">定义</a><a class="toc-depth-2" href="#结构">结构</a><a class="toc-depth-2" href="#场景示例">场景示例</a><a class="toc-depth-2" href="#优点">优点</a><a class="toc-depth-2" href="#缺点">缺点</a><a class="toc-depth-2" href="#应用场景">应用场景</a><a class="toc-depth-2" href="#总结">总结</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="C 中的 typedef 关键字允许你定义新的类型。"><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>十二、类型定义和结构体 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/C语言入门手册/">C语言入门手册</a> <span>2021/12/24</span>  <span>2 分钟阅读</span> </div> <h1>十二、类型定义和结构体</h1>  <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/C语言/">
+#C语言 </a> </div> </header> <div class="prose" data-pagefind-body>  <p>C 中的 <code>typedef</code> 关键字允许你定义新的类型。</p>
+<p>我们可以从 C 内置的类型开始创建自己的类型，使用这个语法：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">typedef</span><span style="color:#E1E4E8"> existingtype NEWTYPE</span></span></code></pre>
+<p>按照惯例，我们创建的新类型通常是大写的。</p>
+<p>这样可以更加容易区分它，并且可以立即识别出它是一种类型。</p>
+<p>例如，我们可以定义一个新的 <code>NUMBER</code> 类型，它还是 <code>int</code>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">typedef</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> NUMBER</span></span></code></pre>
+<p>一旦你这么做了之后，你就可以定义新的 <code>NUMBER</code> 变量了：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#E1E4E8">NUMBER one </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>现在你可能会问：为什么？为什么不直接使用内置的 <code>int</code> 类型呢？</p>
+<p>嗯，当两个东西搭配在一起的时候，<code>typedef</code> 会变得真的很有用：枚举类型和结构体。</p>
+<h2 id="枚举类型">枚举类型</h2>
+<p>使用 <code>typedef</code> 和 <code>enum</code> 关键字，我们可以定义具有指定值的类型。</p>
+<p>这是 <code>typedef</code> 关键字最重要的使用场景之一。</p>
+<p>这是枚举类型的语法：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">typedef</span><span style="color:#F97583"> enum</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  //值……</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>按照惯例，我们创建的枚举类通常是大写的。</p>
+<p>这里是一个简单的示例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">typedef</span><span style="color:#F97583"> enum</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">  true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  false</span></span>
+<span class="line"><span style="color:#E1E4E8">} BOOLEAN;</span></span></code></pre>
+<p>C 自带 <code>bool</code> 类型，所以这个示例并不实用，但是它会让你领悟到其中的精髓。</p>
+<p>另一个示例是定义一周中的那几个日子：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">typedef</span><span style="color:#F97583"> enum</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  monday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  tuesday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  wednesday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  thursday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  friday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  saturday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  sunday</span></span>
+<span class="line"><span style="color:#E1E4E8">} WEEKDAY;</span></span></code></pre>
+<p>这里是使用这个枚举类的一个简单程序：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;stdio.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">typedef</span><span style="color:#F97583"> enum</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  monday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  tuesday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  wednesday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  thursday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  friday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  saturday,</span></span>
+<span class="line"><span style="color:#E1E4E8">  sunday</span></span>
+<span class="line"><span style="color:#E1E4E8">} WEEKDAY;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  WEEKDAY day </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> monday;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (day </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> monday) {</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"It's monday!"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"It's not monday"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>枚举定义中的每个枚举项在内部都与一个整数配对。所以在这个示例中 <code>monday</code> 是 0，<code>tuesday</code> 是 1，以此类推。</p>
+<p>这意味着对应的条件可以是 <code>if (day == 0)</code> 而不是 <code>if (day == monday)</code>，但是对于我们人类来说，使用名字比数字更合理，所以它是一个非常便利的语法。</p>
+<h2 id="结构体">结构体</h2>
+<p>利用 <code>struct</code> 关键字，我们可以使用基本的 C 类型创建复杂的数据结构。</p>
+<p>结构体是一组由不同类型的值组成的集合。C 中的数组被限制为一种类型，所以结构体在很多用例中会显得非常有趣。</p>
+<p>这里是结构体的语法：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#F97583"> &#x3C;</span><span style="color:#E1E4E8">structname</span><span style="color:#F97583">></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  //变量……</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>示例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age;</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">name;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>通过将变量添加到右花括号之后，分号之前，你可以声明类型为该结构体的变量，就像这样：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age;</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">name;</span></span>
+<span class="line"><span style="color:#E1E4E8">} flavio;</span></span></code></pre>
+<p>或者多个变量也行，就像这样：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age;</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">name;</span></span>
+<span class="line"><span style="color:#E1E4E8">} flavio, </span><span style="color:#FFAB70">people</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8">];</span></span></code></pre>
+<p>这次我声明一个名为 <code>flavio</code> 的 <code>person</code> 变量，以及一个具有 20 个 <code>person</code> 的名为 <code>people</code> 的数组。</p>
+<p>我们也可以稍后再声明变量，使用这个语法：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age;</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">name;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person flavio;</span></span></code></pre>
+<p>我们可以在声明的时候初始化一个结构体：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age;</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">name;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person flavio </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">37</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"Flavio"</span><span style="color:#E1E4E8"> };</span></span></code></pre>
+<p>一旦定义了结构体，我们就可以使用一个点（<code>.</code>）来访问它里面的值了：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age;</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">name;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person flavio </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">37</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"Flavio"</span><span style="color:#E1E4E8"> };</span></span>
+<span class="line"><span style="color:#B392F0">printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%s</span><span style="color:#9ECBFF">, age </span><span style="color:#79B8FF">%u</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, flavio.name, flavio.age);</span></span></code></pre>
+<p>我们也可以使用点语法改变结构体中的值：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age;</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">name;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">struct</span><span style="color:#E1E4E8"> person flavio </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">37</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"Flavio"</span><span style="color:#E1E4E8"> };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">flavio.age </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 38</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>结构体非常有用，因为它们既可以作为函数的参数，也可以作为函数的返回值，以及它们内部的嵌入变量。每个变量都有一个标签。</p>
+<p>注意到结构体是 <strong>复制传递</strong> 的，这一点很重要，除非，当然你可以传递一个指向结构体的指针，这种情况下它就是引用传递。</p>
+<p>使用 <code>typedef</code>，我们可以简化处理结构体时的代码。</p>
+<p>咱们看一个示例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">typedef</span><span style="color:#F97583"> struct</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> age;</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">name;</span></span>
+<span class="line"><span style="color:#E1E4E8">} PERSON;</span></span></code></pre>
+<p>按照惯例，我们使用 <code>typedef</code> 创建的结构体通常是大写的。</p>
+<p>现在，我们可以像这样声明一个新的 <code>PERSON</code> 变量：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#E1E4E8">PERSON flavio;</span></span></code></pre>
+<p>并且我们可以用这种方式在声明的时候初始化它们：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#E1E4E8">PERSON flavio </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">37</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"Flavio"</span><span style="color:#E1E4E8"> };</span></span></code></pre>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885501/"><span>上一篇</span><strong>十五、预处理器</strong></a> <a href="/post/164885499/"><span>下一篇</span><strong>十三、命令行参数</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885489/"> <span>2021/12/24 · C语言入门手册</span> <strong>八、指针</strong> </a><a href="/post/164885498/"> <span>2021/12/24 · C语言入门手册</span> <strong>十一、变量作用域</strong> </a><a href="/post/164885499/"> <span>2021/12/24 · C语言入门手册</span> <strong>十三、命令行参数</strong> </a> </div> </section> </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-2" href="#枚举类型">枚举类型</a><a class="toc-depth-2" href="#结构体">结构体</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

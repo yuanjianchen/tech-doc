@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="作为开发利器的maven，为我们提供了十分丰富的命令，了解maven的命令行操作并熟练运用常见的maven命令还是十分必要的，即使譬如IDEA等工具给我提供了图形界面化工具，但其底层还是依靠maven命令来驱动的。因此，知其然，知其所以然，方能百战不殆。"><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>Maven-命令 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/Maven/">Maven</a> <span>2020/08/03</span>  <span>3 分钟阅读</span> </div> <h1>Maven-命令</h1> <p>作为开发利器的maven，为我们提供了十分丰富的命令，了解maven的命令行操作并熟练运用常见的maven命令还是十分必要的，即使譬如IDEA等工具给我提供了图形界面化工具，但其底层还是依靠maven命令来驱动的。因此，知其然，知其所以然，方能百战不殆。</p> <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/maven/">
+#maven </a> </div> </header> <div class="prose" data-pagefind-body>  <p>前篇已经讲过，Maven本质上是一个插件框架，并不执行任何具体的构建任务，它把所有这些任务都交给插件来完成。</p>
+<p>作为开发利器的maven，为我们提供了十分丰富的命令，了解maven的命令行操作并熟练运用常见的maven命令还是十分必要的，即使譬如IDEA等工具给我提供了图形界面化工具，但其底层还是依靠maven命令来驱动的。因此，知其然，知其所以然，方能百战不殆。</p>
+<p><em>Maven的命令格式如下：</em></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">mvn</span><span style="color:#E1E4E8"> [plugin-name]:[goal-name]</span></span></code></pre>
+<p>该命令的意思是：执行<code>plugin-name</code>插件的<code>goal-name</code>目标。</p>
+<p>用户可以通过两种方式调用Maven插件的目标：</p>
+<ol>
+<li>将插件目标与生命周期阶段<code>lifecycle phase</code>绑定，这样用户在命令行只是输入生命周期阶段而已，例如Maven默认将<code>maven-compiler-plugin</code>的<code>compile</code>目标与<code>compile</code>生命周期阶段绑定，因此命令<code>mvn compile</code>实际上是先定位到<code>compile</code>这一生命周期阶段，然后再根据绑定关系调用<code>maven-compiler-plugin</code>的<code>compile</code>目标。</li>
+<li>直接在命令行指定要执行的插件目标，例如<code>mvnarchetype:generate </code>就表示调用<code>maven-archetype-plugin</code>的<code>generate</code>目标，这种带冒号的调用方式与生命周期无关。</li>
+</ol>
+<h3 id="常用命令">常用命令</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>命令</th><th>描述</th></tr></thead><tbody><tr><td>mvn –version</td><td>显示版本信息</td></tr><tr><td>mvn clean</td><td>清理项目生产的临时文件,一般是模块下的target目录</td></tr><tr><td>mvn compile</td><td>编译源代码，一般编译模块下的src/main/java目录</td></tr><tr><td>mvn package</td><td>项目打包工具,会在模块下的target目录生成jar或war等文件</td></tr><tr><td>mvn test</td><td>测试命令,或执行src/test/java/下junit的测试用例.</td></tr><tr><td>mvn install</td><td>将打包的jar/war文件复制到你的本地仓库中,供其他模块使用</td></tr><tr><td>mvn deploy</td><td>将打包的文件发布到远程参考,提供其他人员进行下载依赖</td></tr><tr><td>mvn site</td><td>生成项目相关信息的网站</td></tr><tr><td>mvn eclipse:eclipse</td><td>将项目转化为Eclipse项目</td></tr><tr><td>mvn dependency:tree</td><td>打印出项目的整个依赖树</td></tr><tr><td>mvn archetype:generate</td><td>创建Maven的普通java项目</td></tr><tr><td>mvn tomcat:run</td><td>在tomcat容器中运行web应用</td></tr><tr><td>mvn jetty:run</td><td>调用 Jetty 插件的 Run 目标在 Jetty Servlet 容器中启动 web 应用</td></tr></tbody></table>
+<blockquote>
+<p>注意：运行maven命令的时候，首先需要定位到maven项目的目录，也就是项目的pom.xml文件所在的目录。否则，必以通过参数来指定项目的目录。</p>
+<h3 id="命令参数">命令参数</h3>
+<p>上面列举的只是比较通用的命令，其实很多命令都可以携带参数以执行更精准的任务。
+Maven命令可携带的参数类型如下：</p>
+<h6 id="1----d-传入属性参数">1.   -D 传入属性参数</h6>
+<p>比如命令：
+<code>mvn package -Dmaven.test.skip=true</code>
+以<code>-D</code>开头，将<code>maven.test.skip</code>的值设为<code>true</code>,就是告诉maven打包的时候跳过单元测试。同理，<code>mvn deploy-Dmaven.test.skip=true</code>代表部署项目并跳过单元测试。</p>
+<h6 id="2----p-使用指定的profile配置">2.   -P 使用指定的Profile配置</h6>
+<p>比如项目开发需要有多个环境，一般为开发，测试，预发，正式4个环境，在pom.xml中的配置如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">profiles</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">profile</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">>dev&#x3C;/</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">properties</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">env</span><span style="color:#E1E4E8">>dev&#x3C;/</span><span style="color:#85E89D">env</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;/</span><span style="color:#85E89D">properties</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">activation</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">activeByDefault</span><span style="color:#E1E4E8">>true&#x3C;/</span><span style="color:#85E89D">activeByDefault</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;/</span><span style="color:#85E89D">activation</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">profile</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">profile</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">>qa&#x3C;/</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">properties</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">env</span><span style="color:#E1E4E8">>qa&#x3C;/</span><span style="color:#85E89D">env</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;/</span><span style="color:#85E89D">properties</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">profile</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">profile</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">>pre&#x3C;/</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">properties</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">env</span><span style="color:#E1E4E8">>pre&#x3C;/</span><span style="color:#85E89D">env</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;/</span><span style="color:#85E89D">properties</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">profile</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">profile</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">>prod&#x3C;/</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">properties</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">env</span><span style="color:#E1E4E8">>prod&#x3C;/</span><span style="color:#85E89D">env</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8"> &#x3C;/</span><span style="color:#85E89D">properties</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">profile</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">profiles</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">......</span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">build</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">filters</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">filter</span><span style="color:#E1E4E8">>config/${env}.properties&#x3C;/</span><span style="color:#85E89D">filter</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">filters</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">resources</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">resource</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;</span><span style="color:#85E89D">directory</span><span style="color:#E1E4E8">>src/main/resources&#x3C;/</span><span style="color:#85E89D">directory</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;</span><span style="color:#85E89D">filtering</span><span style="color:#E1E4E8">>true&#x3C;/</span><span style="color:#85E89D">filtering</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">resource</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">resources</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">......</span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">build</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p><code>profiles</code>定义了各个环境的变量<code>id</code>，<code>filters</code>中定义了变量配置文件的地址，其中地址中的环境变量就是上面<code>profile</code>中定义的值，<code>resources</code>中是定义哪些目录下的文件会被配置文件中定义的变量替换。
+通过maven可以实现按不同环境进行打包部署，命令为: </p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>mvn package -P dev</span></span></code></pre>
+<p>其中<code>dev</code>为环境的变量id,代表使用Id为<code>dev</code>的<code>profile</code>。</p>
+<h6 id="3---e-显示maven运行出错的信息">3.  -e 显示maven运行出错的信息</h6>
+<h6 id="4---o-离线执行命令即不去远程仓库更新包">4.  -o 离线执行命令,即不去远程仓库更新包</h6>
+<h6 id="5----x-显示maven允许的debug信息">5.   -X 显示maven允许的debug信息</h6>
+<h6 id="6----u-强制去远程更新snapshot的插件或依赖默认每天只更新一次">6.   -U 强制去远程更新snapshot的插件或依赖，默认每天只更新一次</h6>
+</blockquote>
+<h4 id="maven命令实例">maven命令实例</h4>
+<p>下面结合几个实例来看看maven命令的使用方法。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>archetype:create &#x26; archetype:generate</span></span></code></pre>
+<p><code>archetype</code>是<code>原型</code>的意思，maven可以根据各种原型来快速创建一个maven项目。</p>
+<p><code>archetype:create</code>是maven 3.0.5之前创建项目的命令，例如创建一个普通的Java项目：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">mvn</span><span style="color:#9ECBFF"> archetype:create</span><span style="color:#79B8FF"> -DgroupId=packageName</span><span style="color:#79B8FF"> -DartifactId=projectName</span><span style="color:#79B8FF"> -Dversion=1.0.0-SNAPSHOT</span></span></code></pre>
+<p>后面的三个参数用于指定项目的<code>groupId</code>、<code>artifactId</code>以及<code>version</code>。</p>
+<p>创建Maven的Web项目：  </p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">mvn</span><span style="color:#9ECBFF"> archetype:create</span><span style="color:#79B8FF"> -DgroupId=packageName</span><span style="color:#79B8FF"> -DartifactId=projectName</span><span style="color:#79B8FF"> -DarchetypeArtifactId=maven-archetype-webapp</span></span></code></pre>
+<p><code>archetypeArtifactId</code>参数用于指定使用哪个maven原型，这里使用的是<code>maven-archetype-webapp</code>，maven会按照web应用的目录结构生成项目。</p>
+<p>需要注意的是，在maven 3.0.5之后，archetype:create命令不在使用，取而代之的是archetype:generate命令。</p>
+<blockquote>
+<p>Eclipse Maven运行操作
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/08/1240-20200803020407057.png" alt="eclipse"></p>
+<p>IDEA Maven运行操作
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/08/1240-20200803020426580.png" alt="IDEA">
+都要选择在运行的项目的pom文件目录</p>
+</blockquote>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885719/"><span>上一篇</span><strong>设计模式 - 简单工厂模式</strong></a> <a href="/post/164885522/"><span>下一篇</span><strong>Maven-初识</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885517/"> <span>2020/08/03 · Maven</span> <strong>Maven-POM</strong> </a><a href="/post/164885513/"> <span>2020/08/03 · Maven</span> <strong>Maven-Idea查看解决jar包冲突</strong> </a><a href="/post/164885524/"> <span>2020/08/03 · Maven</span> <strong>Maven-插件</strong> </a> </div> </section> </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-3" href="#常用命令">常用命令</a><a class="toc-depth-3" href="#命令参数">命令参数</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

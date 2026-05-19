@@ -1,0 +1,138 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="C 是一门静态类型语言。"><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>二、变量与类型 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/C语言入门手册/">C语言入门手册</a> <span>2021/12/23</span>  <span>3 分钟阅读</span> </div> <h1>二、变量与类型</h1> <p>C 是一门静态类型语言。</p> <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/C语言/">
+#C语言 </a> </div> </header> <div class="prose" data-pagefind-body>  <p>C 是一门静态类型语言。</p>
+<p>这意味着任何变量都有一个相关联的类型，并且该类型在编译时是可知的。这与Python、JavaScript、PHP 和其它解释型语言中使用变量的方式大有不同。</p>
+<p>在 C 中创建变量时，必须在声明中给出该变量的类型。</p>
+<p>在这个示例中，我们初始化一个 <code>int</code> 类型的变量 <code>age</code>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> age;</span></span></code></pre>
+<p>变量名可以包含任意大写或小写字母，也可以包含数字和下划线，但是不能以数字开头。<code>AGE</code> 和 <code>Age10</code> 都是有效的变量名，但 <code>1age</code> 就不是了。</p>
+<p>还可以在声明中初始化变量，给出初始值即可：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> age </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 35</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>变量一旦声明，就可以在程序代码中使用它了。你在任何时候都可以使用 <code>=</code> 改变它的值，例如 <code>age = 100;</code>（提供的新值的类型与原值相同）。</p>
+<p>但是下面这种情况下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;stdio.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> age </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    age </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 37.2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%u</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, age);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>编译器会在编译时发出警告，然后将小数转为整数。</p>
+<p>C的内置数据类型有 <code>int</code>、<code>char</code>、<code>short</code>、<code>long</code>、<code>float</code>、<code>double</code>、<code>long double</code>。</p>
+<h1 id="整数">整数</h1>
+<p>C 给我们提供了下列定义整数的类型：</p>
+<ul>
+<li><code>char</code></li>
+<li><code>int</code></li>
+<li><code>short</code></li>
+<li><code>long</code></li>
+</ul>
+<p><code>char</code> 类型通常被用来保存 ASCII 表中的字母，但是它也可以用来保存 <code>-128</code> 到 <code>127</code> 之间的小整数。它占据至少一个字节。</p>
+<p><code>int</code> 占据至少两个字节。<code>short</code> 占据至少两个字节。<code>long</code> 占据至少四个字节。</p>
+<p>在不同环境下，每种数据类型所储存的值是可能不同的，至于每种数据类型所储存的具体值由不同系统的实现和架构决定的。</p>
+<p>但一定会遵循一下准则：</p>
+<ul>
+<li><code>short</code> 不会比 <code>int</code> 长</li>
+<li><code>long</code> 不会比 <code>int</code> 短</li>
+</ul>
+<h1 id="无符号整数">无符号整数</h1>
+<p>对于以上所有的数据类型，我们都可以在其前面追加一个 <code>unsigned</code>。这样一来，值的范围就不再从负数开始，而是从 0 开始。这在很多情况下是很有用的。</p>
+<ul>
+<li><code>unsigned char</code> 的范围从 <code>0</code> 开始，至少到 <code>255</code></li>
+<li><code>unsigned int</code> 的范围从 <code>0</code> 开始，至少到 <code>65,535</code></li>
+<li><code>unsigned short</code> 的范围从 <code>0</code> 开始，至少到 <code>65,535</code></li>
+<li><code>unsigned long</code> 的范围从 <code>0</code> 开始，至少到 <code>4,294,967,295</code></li>
+</ul>
+<h1 id="溢出问题">溢出问题</h1>
+<p>鉴于所有这些限制，可能会出现一个问题：我们如何确保数字不超过限制？如果超过了限制会怎样？</p>
+<p>如果有一个值为 255 的 <code>unsigned int</code>，自增返回的值为 256，这在意料之中。如果有一个值为 255 的 <code>unsigned char</code>，自增得到的结果就是 0。它重置为了初始值。</p>
+<p>如果你有一个值为 255 的 <code>unsigned char</code>，给它加上 10 会得到数字 <code>9</code>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> "stdio.h"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    unsigned</span><span style="color:#F97583"> char</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 255</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%u\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, a);</span><span style="color:#6A737D"> // 255</span></span>
+<span class="line"><span style="color:#E1E4E8">    a </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%u\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, a);</span><span style="color:#6A737D"> // 9</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>如果变量是有符号的，则程序的行为则是未知的。程序基本上会给一个很大的值，这个值可能变化，就像这样：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> "stdio.h"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 127</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    j </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%u</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, j);</span><span style="color:#6A737D"> /* 4294967177 */</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h1 id="声明错误类型时的警告">声明错误类型时的警告</h1>
+<p>如果声明变量并用错误的值进行初始化，<code>gcc</code> 编译器应该会发出警告：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;stdio.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1000</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">gcc</span><span style="color:#9ECBFF"> hello.c</span><span style="color:#79B8FF"> -o</span><span style="color:#9ECBFF"> hello</span></span>
+<span class="line"><span style="color:#B392F0">hello.c:8:14:</span><span style="color:#9ECBFF"> warning:</span><span style="color:#9ECBFF"> implicit</span><span style="color:#9ECBFF"> conversion</span><span style="color:#9ECBFF"> from</span><span style="color:#9ECBFF"> 'int'</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> 'char'</span><span style="color:#9ECBFF"> changes</span><span style="color:#9ECBFF"> value</span><span style="color:#9ECBFF"> from</span><span style="color:#79B8FF"> 1000</span><span style="color:#9ECBFF"> to</span><span style="color:#79B8FF"> -24</span><span style="color:#E1E4E8"> [-Wconstant-conversion]</span></span>
+<span class="line"><span style="color:#B392F0">    char</span><span style="color:#9ECBFF"> a</span><span style="color:#9ECBFF"> =</span><span style="color:#79B8FF"> 1000</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">         ~</span><span style="color:#9ECBFF">   ^~~~</span></span>
+<span class="line"><span style="color:#B392F0">1</span><span style="color:#9ECBFF"> warning</span><span style="color:#9ECBFF"> generated.</span></span>
+<span class="line"></span></code></pre>
+<p>如果直接赋值，也会有警告：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;stdio.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#E1E4E8"> j;</span></span>
+<span class="line"><span style="color:#E1E4E8">  j </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1000</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">gcc</span><span style="color:#9ECBFF"> hello.c</span><span style="color:#79B8FF"> -o</span><span style="color:#9ECBFF"> hello</span></span>
+<span class="line"><span style="color:#B392F0">hello.c:9:9:</span><span style="color:#9ECBFF"> warning:</span><span style="color:#9ECBFF"> implicit</span><span style="color:#9ECBFF"> conversion</span><span style="color:#9ECBFF"> from</span><span style="color:#9ECBFF"> 'int'</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> 'char'</span><span style="color:#9ECBFF"> changes</span><span style="color:#9ECBFF"> value</span><span style="color:#9ECBFF"> from</span><span style="color:#79B8FF"> 1000</span><span style="color:#9ECBFF"> to</span><span style="color:#79B8FF"> -24</span><span style="color:#E1E4E8"> [-Wconstant-conversion]</span></span>
+<span class="line"><span style="color:#B392F0">    j</span><span style="color:#9ECBFF"> =</span><span style="color:#79B8FF"> 1000</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">      ~</span><span style="color:#9ECBFF"> ^~~~</span></span>
+<span class="line"><span style="color:#B392F0">1</span><span style="color:#9ECBFF"> warning</span><span style="color:#9ECBFF"> generated.</span></span>
+<span class="line"></span></code></pre>
+<p>但是对值进行增加操作（例如，使用 <code>+=</code>）就不会有警告：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;stdio.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  char</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  j </span><span style="color:#F97583">+=</span><span style="color:#79B8FF"> 1000</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h1 id="浮点数">浮点数</h1>
+<p>浮点类型可以表示的数值范围比整数大得多，还可以表示整数无法表示的分数。</p>
+<p>浮点数有下面几种类型</p>
+<ul>
+<li><code>float</code></li>
+<li><code>double</code></li>
+<li><code>long double</code></li>
+</ul>
+<p>这几种类型都可以表示正数和负数。</p>
+<p>任何 C 的实现都必须满足的最小要求是 <code>float</code> 可以表示范围在 10^-37 到 10^+37 之间的数，这通常用 32 位比特实现。 <code>double</code> 可以表示一组更大范围的数，<code>long double</code> 可以保存的数还要更多。</p>
+<p>与整数一样，浮点数的确切值取决于具体实现。</p>
+<p>在现代的 Mac 上，<code>float</code> 用 32 位表示，精度为 24 个有效位，剩余 8 位被用来编码指数部分。</p>
+<p><code>double</code> 用 64 位表示，精度为 53 个有效位，剩余 11 为用于编码指数部分。</p>
+<p><code>long double</code> 类型用 80 位表示，精度为 64 位有效位，剩余 15 位被用来编码指数部分。</p>
+<p>怎么样能在自己的计算机上确定这些类型的大小呢？我们可以写一个程序来干这事儿：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;stdio.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"char size: </span><span style="color:#79B8FF">%lu</span><span style="color:#9ECBFF"> bytes</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">char</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"int size: </span><span style="color:#79B8FF">%lu</span><span style="color:#9ECBFF"> bytes</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"short size: </span><span style="color:#79B8FF">%lu</span><span style="color:#9ECBFF"> bytes</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">short</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"long size: </span><span style="color:#79B8FF">%lu</span><span style="color:#9ECBFF"> bytes</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">long</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"float size: </span><span style="color:#79B8FF">%lu</span><span style="color:#9ECBFF"> bytes</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">float</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"double size: </span><span style="color:#79B8FF">%lu</span><span style="color:#9ECBFF"> bytes</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">double</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"long double size: </span><span style="color:#79B8FF">%lu</span><span style="color:#9ECBFF"> bytes</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">long</span><span style="color:#F97583"> double</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">char</span><span style="color:#9ECBFF"> size:</span><span style="color:#79B8FF"> 1</span><span style="color:#9ECBFF"> bytes</span></span>
+<span class="line"><span style="color:#B392F0">int</span><span style="color:#9ECBFF"> size:</span><span style="color:#79B8FF"> 4</span><span style="color:#9ECBFF"> bytes</span></span>
+<span class="line"><span style="color:#B392F0">short</span><span style="color:#9ECBFF"> size:</span><span style="color:#79B8FF"> 2</span><span style="color:#9ECBFF"> bytes</span></span>
+<span class="line"><span style="color:#B392F0">long</span><span style="color:#9ECBFF"> size:</span><span style="color:#79B8FF"> 8</span><span style="color:#9ECBFF"> bytes</span></span>
+<span class="line"><span style="color:#B392F0">float</span><span style="color:#9ECBFF"> size:</span><span style="color:#79B8FF"> 4</span><span style="color:#9ECBFF"> bytes</span></span>
+<span class="line"><span style="color:#B392F0">double</span><span style="color:#9ECBFF"> size:</span><span style="color:#79B8FF"> 8</span><span style="color:#9ECBFF"> bytes</span></span>
+<span class="line"><span style="color:#B392F0">long</span><span style="color:#9ECBFF"> double</span><span style="color:#9ECBFF"> size:</span><span style="color:#79B8FF"> 16</span><span style="color:#9ECBFF"> bytes</span></span></code></pre>
+<h1 id="常量">常量</h1>
+<p>常量的声明与变量类似，不同之处在于常量声明的前面带有 <code>const</code> 关键字，并且需要给常量指定一个值。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> age </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 37</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>通常情况下将常量声明为大写</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> AGE </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 37</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>另一种定义常量的方式是使用这种语法：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">#define</span><span style="color:#B392F0"> AGE</span><span style="color:#79B8FF"> 37</span></span></code></pre>
+<p>在这种情况下，不需要添加类型，也不需要使用等于符号 <code>=</code>，并且可以省略末尾的分号。C 编译器将会在编译时从声明的值推断出相应的类型。</p>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885416/"><span>上一篇</span><strong>一、C语言简介</strong></a> <a href="/post/164885482/"><span>下一篇</span><strong>三、运算符</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885489/"> <span>2021/12/24 · C语言入门手册</span> <strong>八、指针</strong> </a><a href="/post/164885498/"> <span>2021/12/24 · C语言入门手册</span> <strong>十一、变量作用域</strong> </a><a href="/post/164885499/"> <span>2021/12/24 · C语言入门手册</span> <strong>十三、命令行参数</strong> </a> </div> </section> </footer> </div>  </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

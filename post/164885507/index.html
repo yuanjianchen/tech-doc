@@ -1,0 +1,572 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="JVM 对象的创建流程,内存分配原则策略以及对象存活判定."><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>对象的创建与死亡以及内存分配、回收机制 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/JVM/">JVM</a> <span>2020/09/09</span>  <span>8 分钟阅读</span> </div> <h1>对象的创建与死亡以及内存分配、回收机制</h1> <p>JVM 对象的创建流程,内存分配原则策略以及对象存活判定.</p> <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/JVM/">
+#JVM </a><a class="article-tag-link" href="/tags/Java/">
+#Java </a> </div> </header> <div class="prose" data-pagefind-body>  <h2 id="对象的创建">对象的创建</h2>
+<h3 id="对象创建的主要流程">对象创建的主要流程</h3>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/09/07/image-20200907160940185.png" alt="对象创建的流程"></p>
+<h3 id="类加载检查">类加载检查</h3>
+<p>当虚拟机遇到<code>new</code>指令时，首先要检查这个指令的参数是否能在常量池中找到类的符号引用，并检查这个符号引用的类是否已经被加载，验证、解析、初始化过，如果没有那必须先执行相应的类加载过程。</p>
+<h3 id="分配内存">分配内存</h3>
+<p>类加载检查通过后，接下来虚拟机要为新生对象分配内存。对象所需要的内存大小在类加载后便可确定。为对象分配空间的任务等同于把一块大小的确定的内存从堆内存中划分出来。</p>
+<p>对象内存分配中有两个问题：</p>
+<ol>
+<li>如何进行内存划分</li>
+<li>并发情况下如何保证多个对象同时内存分配成功。</li>
+</ol>
+<h4 id="内存分配方式">内存分配方式</h4>
+<h5 id="指针碰撞bump-the-pointer">指针碰撞（bump the Pointer）</h5>
+<p>假设 Java 堆内存是绝对规整的，所有用过的内存都放在一边，空闲的内存放在另一边，中间放一个指针作为分界点的指示器，那么分配内存就仅仅是把指针向空闲那部分移动对象大小相等的距离。</p>
+<h5 id="空闲列表free-list">空闲列表（Free List）</h5>
+<p>如果 Java 堆内存不是规整的，已使用的内存和未使用的内存空间交错，此时无法使用指针碰撞分配方式，则需要由虚拟机维护一个内存列表，记录哪些内存时可用的，在分配的时候找到一块足够大的空间分配给对象，并更新列表。</p>
+<h4 id="并发分配">并发分配</h4>
+<h5 id="线程同步处理">线程同步处理</h5>
+<p>虚拟机通过 CAS + 失败重试机制将内存分配空间的动作进行同步处理。</p>
+<h5 id="本地线程分配缓冲">本地线程分配缓冲</h5>
+<p>本地线程分配缓冲（Thread Local Allocation buffe，TLAB）是把内存空间分配动作按照线程分配到不同的空间进行，即每个线程在 Java 堆中预先分配一小块内存。哪个线程需要分配内存，就在哪个线程的 TLAB 上进行，只有在 TLAB 用完并分配新的 TLAB 时才需要进行同步锁定，虚拟机默认开启 TLAB。虚拟机是否启用 TLAB 可以通过 <code>+XX:+/-UseTLAB</code>  参数来设定。</p>
+<h3 id="对象初始化">对象初始化</h3>
+<p>内存分配完之后，虚拟机需要将分配到的内存空间都初始化为零值（不包括对象头）。如果使用 TLAB，这一过程也可以提前至 TLAB 时进行。对象实例属性初始化零值保证了对象实例字段在 Java 代码中不用赋值也能使用，程序能访问到这些对象字段数据类型对应的零值。</p>
+<p>基本数据类型的零值：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>数据类型</th><th>零值</th></tr></thead><tbody><tr><td><code>byte</code></td><td><code>(byte)0</code></td></tr><tr><td><code>char</code></td><td><code>'\u0000'</code></td></tr><tr><td><code>short</code></td><td><code>(short)0</code></td></tr><tr><td><code>boolean</code></td><td><code>false</code></td></tr><tr><td><code>int</code></td><td><code>0</code></td></tr><tr><td><code>long</code></td><td><code>0l</code></td></tr><tr><td><code>float</code></td><td><code>0.0f</code></td></tr><tr><td><code>double</code></td><td><code>0.0</code></td></tr><tr><td><code>reference</code></td><td><code>null</code></td></tr></tbody></table>
+<h3 id="设置对象头">设置对象头</h3>
+<p>在对象初始化之后，虚拟机还需要对对象进行必要的设置，例如这个对象是哪个类的实例，如何才能找到类的元数据信息，对象的哈希码、对象的分代年龄等。这些信息存放在对象的对象头（Object Header）中。</p>
+<h3 id="执行方法">执行<init>方法</init></h3>
+<p>从虚拟机角度来讲，上面的步骤执行完之后，一个新的对象就已经产生。但是从程序员角度来说还需要执行<code>&#x3C;init></code>方法和构造方法为对象的属性赋值。至此一个完整的对象才算生产出来。</p>
+<h2 id="对象的内存布局">对象的内存布局</h2>
+<h3 id="oop-klass-model">OOP-Klass Model</h3>
+<p>在理解对象的内存布局之前，可以总体了解一下在 Hotspot 虚拟机中对象的 OOP-Klass 模型，这里的 OOP 指的是Oridinary Object Pointer(普通对象指针)，他用来表示对象的实例信息，实际上是隐藏在在指针里面的对象。而 Klass 则包含元数据和方法信息，用来描述 Java 类。</p>
+<p>JVM 使用 Oop 来表示一个对象，在 Java 程序运行过程中，每创建一个新的对象，在 JVM 内部都会在 JVM 内部创建一个对象类型的 oop 对象。各种 oop 类的共同基类为 oopDesc 类。oop 的继承体系如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#6A737D">// hotspot/src/share/vm/oops/oopsHierarchy.hpp</span></span>
+<span class="line"><span style="color:#E1E4E8">...</span></span>
+<span class="line"><span style="color:#6A737D">// Oop的继承体系</span></span>
+<span class="line"><span style="color:#F97583">typedef</span><span style="color:#E1E4E8"> class oopDesc</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">                            oop;</span></span>
+<span class="line"><span style="color:#F97583">typedef</span><span style="color:#E1E4E8"> class   instanceOopDesc</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">            instanceOop;</span></span>
+<span class="line"><span style="color:#F97583">typedef</span><span style="color:#E1E4E8"> class   arrayOopDesc</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">                    arrayOop;</span></span>
+<span class="line"><span style="color:#F97583">typedef</span><span style="color:#E1E4E8"> class     objArrayOopDesc</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">            objArrayOop;</span></span>
+<span class="line"><span style="color:#F97583">typedef</span><span style="color:#E1E4E8"> class     typeArrayOopDesc</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">            typeArrayOop;</span></span>
+<span class="line"><span style="color:#E1E4E8">...</span></span></code></pre>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/09/08/image-20200908145725254.png" alt="oop 继承体系"></p>
+<p>oop 的子类有两个，分别是 instanceOop 和 arrayOop。前者表示 Java 中普通的对象，后者表示数组对象。oop 的储存结构主要由对象头和对象体组成。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/09/08/image-20200908155943599.png" alt="oop 内存结构"></p>
+<p>Oop 的主要的两个成员属性：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#6A737D">// hotspot/src/share/vm/oops/oop.hpp</span></span>
+<span class="line"><span style="color:#E1E4E8">class oopDesc {</span></span>
+<span class="line"><span style="color:#E1E4E8"> ...</span></span>
+<span class="line"><span style="color:#E1E4E8"> private:</span></span>
+<span class="line"><span style="color:#6A737D">  // 用于存储对象的运行时记录信息，如哈希值、GC分代年龄、锁状态等</span></span>
+<span class="line"><span style="color:#F97583">  volatile</span><span style="color:#E1E4E8"> markOop  _mark;</span></span>
+<span class="line"><span style="color:#6A737D">  // Klass指针的联合体，指向当前对象所属的Klass对象</span></span>
+<span class="line"><span style="color:#F97583">  union</span><span style="color:#E1E4E8"> _metadata {</span></span>
+<span class="line"><span style="color:#6A737D">    // 未采用指针压缩技术时使用</span></span>
+<span class="line"><span style="color:#E1E4E8">    Klass</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">      _klass;</span></span>
+<span class="line"><span style="color:#6A737D">    // 采用指针压缩技术时使用</span></span>
+<span class="line"><span style="color:#E1E4E8">    narrowKlass _compressed_klass;</span></span>
+<span class="line"><span style="color:#E1E4E8">  } _metadata;</span></span>
+<span class="line"><span style="color:#E1E4E8"> ...</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><code>_mark</code>和<code>_metadata</code>被称为<strong>对象头</strong>，其中前者存储对象的运行时记录信息；后者是一个指针，指向当前对象所属的<code>Klass</code>对象。</p>
+<p>和 oop 一样 Klass 也有一个继承体系：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/09/08/image-20200908160820508.png" alt="Klass 继承体系"></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#6A737D">// hotspot/src/share/vm/oops/oopsHierarchy.hpp</span></span>
+<span class="line"><span style="color:#E1E4E8">...</span></span>
+<span class="line"><span style="color:#E1E4E8">class Klass;</span><span style="color:#6A737D">  // Klass继承体系的最高父类</span></span>
+<span class="line"><span style="color:#E1E4E8">class   InstanceKlass;</span><span style="color:#6A737D">  // 表示一个Java普通类，包含了一个类运行时的所有信息</span></span>
+<span class="line"><span style="color:#E1E4E8">class     InstanceMirrorKlass;</span><span style="color:#6A737D">  // 表示java.lang.Class</span></span>
+<span class="line"><span style="color:#E1E4E8">class     InstanceClassLoaderKlass;</span><span style="color:#6A737D"> // 主要用于遍历ClassLoader继承体系</span></span>
+<span class="line"><span style="color:#E1E4E8">class     InstanceRefKlass;</span><span style="color:#6A737D">  // 表示java.lang.ref.Reference及其子类</span></span>
+<span class="line"><span style="color:#E1E4E8">class   ArrayKlass;</span><span style="color:#6A737D">  // 表示一个Java数组类</span></span>
+<span class="line"><span style="color:#E1E4E8">class     ObjArrayKlass;</span><span style="color:#6A737D">  // 普通对象的数组类</span></span>
+<span class="line"><span style="color:#E1E4E8">class     TypeArrayKlass;</span><span style="color:#6A737D">  // 基础类型的数组类</span></span>
+<span class="line"><span style="color:#E1E4E8">...</span></span></code></pre>
+<p>不同于Oop，Klass在<code>InstanceKlass</code>下又设计了3个子类，其中<code>InstanceMirrorKlass</code>用于表示java.lang.Class类型，该类型对应的oop特别之处在于其包含了<code>static field</code>，因此计算<code>oop</code>大小时需要把<code>static field</code>也考虑进来；<code>InstanceClassLoaderKlass</code>主要提供了遍历当前<code>ClassLoader</code>的继承体系；<code>InstanceRefKlass</code>用于表示<code>java.lang.ref.Reference</code>及其子类。</p>
+<p>总体来说在 Hotspot 虚拟机中存在对象、类的元数据（InstanceKlass）、类的 Java 镜像是那种对象。三者之间的关系是这样的：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/09/image-20200909004159729.png" alt="Hotspot Klass"></p>
+<p>每个Java对象的对象头里，_klass字段会指向一个VM内部用来记录类的元数据用的InstanceKlass对象；InsanceKlass里有个_java_mirror字段，指向该类所对应的Java镜像——java.lang.Class实例。HotSpot VM会给Class对象注入一个隐藏字段“klass”，用于指回到其对应的InstanceKlass对象。这样，klass与mirror之间就有双向引用，可以来回导航。
+这个模型里，java.lang.Class实例并不负责记录真正的类元数据，而只是对VM内部的InstanceKlass对象的一个包装供Java的反射访问用。</p>
+<p>在JDK 7或之前的HotSpot VM里，InstanceKlass是被包装在由GC管理的klassOopDesc对象中，存放在GC堆中的所谓Permanent Generation（简称PermGen）中。从JDK 8开始的HotSpot VM则完全移除了PermGen，改为在native memory里存放这些元数据。新的用于存放元数据的内存空间叫做Metaspace，InstanceKlass对象就存在这里。至于java.lang.Class对象，它们从来都是“普通”Java对象，跟其它Java对象一样存在普通的Java堆（GC堆的一部分）里。</p>
+<h3 id="对象头">对象头</h3>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/09/image-20200908210059547.png" alt="对象头"></p>
+<p>Hotspot 虚拟机对象头分为两部分，一部分是用来储存对象自身运行时数据，如 hash 码、GC 分代年龄、锁状态标志、偏向线程 ID、线程持有的锁等，称为<code>Mark Word</code> 即 JVM 中的 markOop。</p>
+<p>另一部分为对象指向它自身类元数据的类型指针。虚拟机通过这个指针来确定对象是哪个类的实例及 _metadata。</p>
+<p>对于数组对象，在对象头中还必须有一块用于记录数组长度的数据。因为虚拟机可以通过普通Java对象的元数据信息确定Java对象的大小，但是从数组的元数据中却无法确定数组的大小。</p>
+<h4 id="mark-word">Mark Word</h4>
+<p>Mark Word 用来储存对象自身运行时数据，如hash码，GC 分代年龄、锁状态、偏向线程 ID、线程持有的锁、偏向时间戳等，这部分数据在 32 位虚拟机和 64 位虚拟机（未开启指针压缩）分别为32bit 和 64 bit。Mark Word 在 32 位虚拟机中存储内容如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/09/08/%E5%AF%B9%E8%B1%A1%E5%A4%B4%20Mark%20Word.png" alt="对象头 Mark Word"></p>
+<h3 id="实例数据">实例数据</h3>
+<p>实例数据部分是对象真正存储的有效信息，也是在程序代码中所定义的各种类型的字段内容。无论是从父类继承下来的，还是在子类中定义的，都需要记录起来。这部分的存储顺序会受到虚拟机分配策略参数和字段在源码中定义顺序的影响。HotSpot 虚拟机默认的分配策略为 longs/doubules、ints、shorts/chars、bytes/booleans、oops。从分配策略中可以看出，相同宽度的字段总是被分配在一起。在满足这个前提条件的情况下，在父类中定义的变量会出现在子类之前。如果 CompactFields 参数值为 true（默认为 true），那么子类中较窄的变量也可能会插入到父类变量的空隙中。</p>
+<h3 id="对齐填充">对齐填充</h3>
+<p>第三部分对齐填充并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。由于HotSpot VM的自动内存管理系统要求对象起始地址必须是8字节的整数倍，换句话说，就是对象的大小必须是8字节的整数倍。而对象头部分正好是8字节的倍数（1倍或者2倍），因此，当对象实例数据部分没有对齐时，就需要通过对齐填充来补全。这种排布方式可以让原始类型字段最大限度地紧凑排布在一起，减少字段间因为对齐而带来的空隙；同时又让引用类型字段尽可能排布在一起，减少OopMap的开销。</p>
+<p>举例来说，对于下面的类 C</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> A</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  boolean</span><span style="color:#E1E4E8"> b;</span></span>
+<span class="line"><span style="color:#E1E4E8">  Object o1;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> B</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> A</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  int</span><span style="color:#E1E4E8"> i;</span></span>
+<span class="line"><span style="color:#F97583">  long</span><span style="color:#E1E4E8"> l;</span></span>
+<span class="line"><span style="color:#E1E4E8">  Object o2;</span></span>
+<span class="line"><span style="color:#F97583">  float</span><span style="color:#E1E4E8"> f;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> C</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> B</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  boolean</span><span style="color:#E1E4E8"> b;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>它的实例对象布局就是：（假定是64位HotSpot VM，开启了压缩指针的话）</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">--></span><span style="color:#F97583">  +</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> [ _mark     ] (</span><span style="color:#79B8FF">64</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">bit header word)</span></span>
+<span class="line"><span style="color:#F97583">     +</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8"> [ _klass    ] (</span><span style="color:#79B8FF">32</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">bit header word, compressed klass pointer)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">12</span><span style="color:#E1E4E8"> [ A.b       ] (</span><span style="color:#F97583">boolean</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#F97583"> byte</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">13</span><span style="color:#E1E4E8"> [ (padding) ] (padding </span><span style="color:#F97583">for</span><span style="color:#E1E4E8"> alignment, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8"> bytes)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">16</span><span style="color:#E1E4E8"> [ A.o1      ] (reference, compressed pointer, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8"> bytes)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8"> [ B.i       ] (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8"> bytes)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8"> [ B.l       ] (</span><span style="color:#F97583">long</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8"> bytes)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">32</span><span style="color:#E1E4E8"> [ B.f       ] (</span><span style="color:#F97583">float</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8"> bytes)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">36</span><span style="color:#E1E4E8"> [ B.o2      ] (reference, compressed pointer, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8"> bytes)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">40</span><span style="color:#E1E4E8"> [ C.b       ] (</span><span style="color:#F97583">boolean</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#F97583"> byte</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    +</span><span style="color:#79B8FF">41</span><span style="color:#E1E4E8"> [ (padding) ] (padding </span><span style="color:#F97583">for</span><span style="color:#E1E4E8"> object alignment, </span><span style="color:#79B8FF">7</span><span style="color:#E1E4E8"> bytes)</span></span></code></pre>
+<p>所以C类的对象实例大小，在这个设定下是48字节，其中有10字节是为对齐而浪费掉的padding，12字节是对象头，剩下的26字节是用户自己代码声明的实例字段。</p>
+<p>留意到C类里字段的排布是按照这个顺序的：对象头 - Object声明的字段（无） - A声明的字段 - B声明的字段 - C声明的字段——按继承深度从浅到深排布。而每个类里面的字段排布顺序则按前面说的规则，按宽度来重排序。同时，如果类继承边界上有空隙（例如这里A和B之间其实本来会有一个4字节的空隙，但B里正好声明了一些不宽于4字节的字段，就可以把第一个不宽于4字节的字段拉到该空隙里，也就是 B.i 的位置）。</p>
+<p>同时也请留意到A类和C类都声明了名字为b的字段。它们之间有什么关系？——没关系。
+Java里，字段是不参与多态的。派生类如果声明了跟基类同名的字段，则两个字段在最终的实例中都会存在；派生类的版本只会在名字上遮盖（shadow / hide）掉基类字段的名字，而不会与基类字段合并或令其消失。上面例子特意演示了一下A.b 与 C.b 同时存在的这个情况。</p>
+<p>使用 JOL工具查看对象的信息：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8"># WARNING</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> Unable to attach Serviceability Agent. You can </span><span style="color:#F97583">try</span><span style="color:#E1E4E8"> again with escalated privileges. Two options: a) use -Djol.tryWithSudo=true to try with sudo; b) echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope</span></span>
+<span class="line"><span style="color:#E1E4E8">tech.stack.C object internals:</span></span>
+<span class="line"><span style="color:#E1E4E8"> OFFSET  SIZE               TYPE DESCRIPTION                               VALUE</span></span>
+<span class="line"><span style="color:#E1E4E8">      0     4                    (object header)                           01 00 00 00 (</span><span style="color:#79B8FF">00000001</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#E1E4E8">) (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">      4     4                    (object header)                           00 00 00 00 (</span><span style="color:#79B8FF">00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#E1E4E8">) (</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">      8     4                    (object header)                           05 c2 00 f8 (</span><span style="color:#79B8FF">00000101</span><span style="color:#79B8FF"> 11000010</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 11111000</span><span style="color:#E1E4E8">) (</span><span style="color:#F97583">-</span><span style="color:#79B8FF">134168059</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">     12     1            boolean A.b                                       false</span></span>
+<span class="line"><span style="color:#E1E4E8">     13     3                    (alignment</span><span style="color:#F97583">/</span><span style="color:#E1E4E8">padding gap)</span></span>
+<span class="line"><span style="color:#E1E4E8">     16     4   java.lang.Object A.o1                                      null</span></span>
+<span class="line"><span style="color:#E1E4E8">     20     4                int B.i                                       0</span></span>
+<span class="line"><span style="color:#E1E4E8">     24     8               long B.l                                       0</span></span>
+<span class="line"><span style="color:#E1E4E8">     32     4              float B.f                                       0.0</span></span>
+<span class="line"><span style="color:#E1E4E8">     36     4   java.lang.Object B.o2                                      null</span></span>
+<span class="line"><span style="color:#E1E4E8">     40     1            boolean C.b                                       false</span></span>
+<span class="line"><span style="color:#E1E4E8">     41     7                    (loss due to the next object alignment)</span></span>
+<span class="line"><span style="color:#E1E4E8">Instance size: 48 bytes</span></span>
+<span class="line"><span style="color:#E1E4E8">Space losses: 3 bytes internal + 7 bytes external = 10 bytes total</span></span></code></pre>
+<h3 id="指针压缩">指针压缩</h3>
+<h4 id="什么是对象的指针压缩">什么是对象的指针压缩</h4>
+<ul>
+<li>
+<p>jdk1.6 update14开始，在64bit操作系统中，JVM支持指针压缩</p>
+</li>
+<li>
+<p>jvm配置参数:UseCompressedOops，compressed­­压缩、oop(ordinary object pointer)­­对象指针</p>
+</li>
+<li>
+<p>启用指针压缩:-­XX:+UseCompressedOops(<strong>默认开启</strong>)，禁止指针压缩:-­XX:-­UseCompressedOops</p>
+</li>
+</ul>
+<h4 id="为什么要进行指针压缩">为什么要进行指针压缩</h4>
+<ul>
+<li>
+<p>在64位平台的HotSpot中使用32位指针，内存使用会多出1.5倍左右，使用较大指针在主内存和缓存之间移动数据， <strong>占用较大IO，同时GC也会承受较大压力</strong></p>
+</li>
+<li>
+<p>为了减少64位平台下内存的消耗，启用指针压缩功能</p>
+</li>
+<li>
+<p>在jvm中，32位地址最大支持4G内存(2的32次方)，可以通过对对象指针的压缩编码、解码方式进行优化，使得 jvm 只用32位地址就可以支持更大的内存配置(小于等于32G)</p>
+</li>
+<li>
+<p>堆内存小于4G时，不需要启用指针压缩，jvm会直接去除高32位地址，即使用低虚拟地址空间</p>
+</li>
+<li>
+<p>堆内存大于32G时，压缩指针会失效，会强制使用64位(即8字节)来对java对象寻址，这就会出现1的问题，所以堆内存不要大于32G为好</p>
+</li>
+</ul>
+<h4 id="compressedoops的原理">CompressedOops的原理</h4>
+<p>32位内最多可以表示4GB，64位地址分为堆的基地址+偏移量，当堆内存&#x3C;32GB时候，在压缩过程中，把偏移量/8后保存到32位地址。在解压再把32位地址放大8倍，所以启用CompressedOops的条件是堆内存要在<code>4GB*8=32GB</code>以内。</p>
+<p>所以压缩指针之所以能改善性能，是因为它通过对齐（Alignment），还有偏移量（Offset）将64位指针压缩成32位。换言之，性能提高是因为使用了更小更节省空间的压缩指针而不是完整长度的64位指针，CPU缓存使用率得到改善，应用程序也能执行得更快。</p>
+<ul>
+<li>
+<p><strong>零基压缩优化(Zero Based Compressd Oops)：</strong></p>
+<p>零基压缩是针对压解压动作的进一步优化。 它通过改变正常指针的随机地址分配特性，强制堆地址从零开始分配（需要OS支持），进一步提高了压解压效率。要启用零基压缩，你分配给JVM的内存大小必须控制在4G以上，32G以下。如果GC堆大小在4G以下，直接砍掉高32位，避免了编码解码过程 如果GC堆大小在4G以上32G以下，则启用UseCompressedOop 如果GC堆大小大于32G，压指失效，使用原来的64位（所以说服务器内存太大不好…）。</p>
+</li>
+</ul>
+<h4 id="案例">案例</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// -XX:-UserCompressedOops</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> App</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        ClassLayout classLayout </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> ClassLayout.</span><span style="color:#B392F0">parseInstance</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> C</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(classLayout.</span><span style="color:#B392F0">toPrintable</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#6A737D">// ---------------</span></span>
+<span class="line"><span style="color:#E1E4E8"># WARNING</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> Unable to attach Serviceability Agent. You can </span><span style="color:#F97583">try</span><span style="color:#E1E4E8"> again with escalated privileges. Two options: a) use -Djol.tryWithSudo=true to try with sudo; b) echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope</span></span>
+<span class="line"><span style="color:#E1E4E8">tech.stack.C object internals:</span></span>
+<span class="line"><span style="color:#E1E4E8"> OFFSET  SIZE               TYPE DESCRIPTION                               VALUE</span></span>
+<span class="line"><span style="color:#E1E4E8">      0     4                    (object header)                           01 00 00 00 (</span><span style="color:#79B8FF">00000001</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#E1E4E8">) (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">      4     4                    (object header)                           00 00 00 00 (</span><span style="color:#79B8FF">00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#E1E4E8">) (</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">      8     4                    (object header)                           30 fd ca 9d (</span><span style="color:#79B8FF">00110000</span><span style="color:#79B8FF"> 11111101</span><span style="color:#79B8FF"> 11001010</span><span style="color:#79B8FF"> 10011101</span><span style="color:#E1E4E8">) (</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1647641296</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">     12     4                    (object header)                           01 00 00 00 (</span><span style="color:#79B8FF">00000001</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#79B8FF"> 00000000</span><span style="color:#E1E4E8">) (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">     16     1            boolean A.b                                       false</span></span>
+<span class="line"><span style="color:#E1E4E8">     17     7                    (alignment</span><span style="color:#F97583">/</span><span style="color:#E1E4E8">padding gap)</span></span>
+<span class="line"><span style="color:#E1E4E8">     24     8   java.lang.Object A.o1                                      null</span></span>
+<span class="line"><span style="color:#E1E4E8">     32     8               long B.l                                       0</span></span>
+<span class="line"><span style="color:#E1E4E8">     40     4                int B.i                                       0</span></span>
+<span class="line"><span style="color:#E1E4E8">     44     4              float B.f                                       0.0</span></span>
+<span class="line"><span style="color:#E1E4E8">     48     8   java.lang.Object B.o2                                      null</span></span>
+<span class="line"><span style="color:#E1E4E8">     56     1            boolean C.b                                       false</span></span>
+<span class="line"><span style="color:#E1E4E8">     57     7                    (loss due to the next object alignment)</span></span>
+<span class="line"><span style="color:#E1E4E8">Instance size: 64 bytes</span></span>
+<span class="line"><span style="color:#E1E4E8">Space losses: 7 bytes internal + 7 bytes external = 14 bytes total</span></span></code></pre>
+<p>使用<code>-XX:-UseCompressedOops</code>关闭指针压缩，再次使用 JOL 工具查看对象 C 内存分配可以看出对象 C 占用了 64 字节，明显要比开启指针压缩时 48 字节大得多。</p>
+<h2 id="对象的访问定位">对象的访问定位</h2>
+<p>程序使用对象是通过栈上的 reference 数据来操作堆上的具体对象。由于 reference 类型在 Java 虚拟机规范中只规定了一个指向对象的引用，并没有定义这个引用应该通过何种方式去定位，访问堆中的对象的具体位置，所以对象访问方式也是取决于虚拟机实现而定的。目前主流的访问方式有使用句柄和直接指针两种中。</p>
+<h3 id="直接指针">直接指针</h3>
+<p>如果使用直接指针访问，那么 Java 堆对象的布局中就必须考虑如何放置访问类型数据的相关信息，而 reference 中存储的直接就是对象地址。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/09/image-20200908230842135.png" alt="直接引用"></p>
+<p>直接指针访问方式最大的好处就是速度快，它节省了一次指针定位的时间开销，由于对象的访问在 Java 中十分频繁，因此此类开销极少成多后也是一项十分可观的成本。HotSpot 虚拟机使用的就是直接指针访问方式。</p>
+<h3 id="句柄访问">句柄访问</h3>
+<p>如果使用句柄访问，那么 Java 堆中会划分出来一块内存来作为句柄池，reference 中存储的就是对象的句柄地址，而句柄中包含了对象实例数据与类型数据各自的具体地址。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/09/image-20200908231416270.png" alt="句柄访问"></p>
+<p>句柄访问最大的好处就是 reference 中存储的是稳定的句柄地址，在对象被移动（垃圾收集时移动对象是非常普遍的行为）时只会改变句柄中的实例数据指针，而 reference 本身不需要修改。</p>
+<h2 id="对象的内存分配">对象的内存分配</h2>
+<p>对象的内存分配一般来说都是堆上分配，但是也可能经过 JIT 编译后被拆散为标量类型并间接地在栈上分配。下面将通过一些代码来理解对象内存分配的规则。</p>
+<h3 id="对象栈上分配">对象栈上分配</h3>
+<h4 id="逃逸分析">逃逸分析</h4>
+<p>逃逸分析（Escape Analysis）的基本行为是就分析对象动态作用域：当一个对象在方法中被定义后，它可以能被外部方法所引用，例如作为调用参数传递到其他方法中，称为方法逃逸。甚至还有可能被外部线程访问到，譬如赋值给类变量或可以在其他线程中访问的实例变量，称为线程逃逸。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> A </span><span style="color:#B392F0">escape</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">    A a </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> A</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    a.b </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    a.o1 </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Object</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> a;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> noEscape</span><span style="color:#E1E4E8">(){</span></span>
+<span class="line"><span style="color:#E1E4E8">    A a </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> A</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    a.b </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    a.o1 </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Object</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>如上例代码 <code>escape</code> 方法中的 <code>a</code>对象返回了，这个对象的作用域范围就无法确定，因此<code>a</code>对象在方法<code>escape</code>中逃逸了。 <code>noEscape</code>方法中的 a 对象我们可以确定当方法结束，这个对象就可以认为是无效对象了，对象<code>a</code> 没有逃逸出 <code>noEscape</code> 方法。</p>
+<p>JVM 对于这种情况可以通过参数<code>-XX:+DoEscapeAnalysis</code>来开启逃逸分析。开启后可以通过<code>-XX:PrintEscapeAnalysis</code>来查看分析结果。JDK7  之后默认开启逃逸分析，如果要关闭使用参数<code>-XX:-DoEscapeAnalysis</code>。</p>
+<h4 id="标量替换">标量替换</h4>
+<p>如果把一个对象拆散，根据程序访问的情况，将其使用到的成员变量恢复原始类型来访问就叫做标量替换（Scalar Replacement）。标量（Scalar）是指一个数据已经无法再分解成更小的数据来表示了，Java 虚拟机中的原始数据类型（int、long 等数值类型以及 reference 类型等）都不能进一步分解，它们就可以成为标量。相对的，如果一个数据可以继续分解，那它就称作聚合量（Aggregate），Java 中的对象就是最典型的聚合量。</p>
+<p>如果逃逸分析证明一个对象不会被外部访问，并且这个对象可以被拆散的话，那程序真正执行的时候将可能不会创建这个对象，而改为直接创建它的若干个被这个方法使用到的成员变量来代替。这些代替的成员变量在栈帧或寄存器上分配空间，这样就不会因为没有一大块连续空间导致对象内存不够分配。开启标量替换参数(-XX:+EliminateAllocations)，JDK7之后默认开启。</p>
+<h4 id="栈上分配示例">栈上分配示例</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * 逃逸分析 标量替换 -> 栈上分配</span></span>
+<span class="line"><span style="color:#6A737D"> * 调用一亿次 alloc() 如果分配到堆上 大约需要 48B x 1000000 ≈ 45m 的空间 如果堆空间小于该值, 必然会触发 GC</span></span>
+<span class="line"><span style="color:#6A737D"> * 使用如下参数不会发生 GC:</span></span>
+<span class="line"><span style="color:#6A737D"> * -Xmx15m -Xms15m -XX:+DoEscapeAnalysis -XX:+EliminateAllocations  -XX:+PrintGCDetails</span></span>
+<span class="line"><span style="color:#6A737D"> * &#x3C;p></span></span>
+<span class="line"><span style="color:#6A737D"> * 使用如下参数都会发生大量 GC</span></span>
+<span class="line"><span style="color:#6A737D"> * 关闭逃逸分析 开启标量替换</span></span>
+<span class="line"><span style="color:#6A737D"> * -Xmx15m -Xms15m -XX:-DoEscapeAnalysis -XX:+EliminateAllocations  -XX:+PrintGCDetails</span></span>
+<span class="line"><span style="color:#6A737D"> * &#x3C;p></span></span>
+<span class="line"><span style="color:#6A737D"> * 开启逃逸分析 关闭标量替换</span></span>
+<span class="line"><span style="color:#6A737D"> * -Xmx15m -Xms15m -XX:+DoEscapeAnalysis -XX:-EliminateAllocations  -XX:+PrintGCDetails</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> AllocateOnStack</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> alloc</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        C c </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> C</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        c.b </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        c.i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        c.f </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2.0F</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        c.l </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1L</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        long</span><span style="color:#E1E4E8"> start </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> System.</span><span style="color:#B392F0">currentTimeMillis</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">        for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 1000000</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">            alloc</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        long</span><span style="color:#E1E4E8"> end </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> System.</span><span style="color:#B392F0">currentTimeMillis</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"time used: "</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> (end </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> start));</span></span>
+<span class="line"><span style="color:#F97583">        try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">            TimeUnit.SECONDS.</span><span style="color:#B392F0">sleep</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (InterruptedException </span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            e.</span><span style="color:#B392F0">printStackTrace</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//  -Xmx15m -Xms15m -XX:+DoEscapeAnalysis -XX:+EliminateAllocations  -XX:+PrintGCDetails</span></span>
+<span class="line"><span style="color:#E1E4E8">time used</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> 11</span></span>
+<span class="line"><span style="color:#E1E4E8">[</span><span style="color:#B392F0">GC</span><span style="color:#E1E4E8"> (Allocation Failure) [PSYoungGen</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> 4096K</span><span style="color:#F97583">-></span><span style="color:#E1E4E8">480</span><span style="color:#B392F0">K</span><span style="color:#E1E4E8">(4608K)] 4096K</span><span style="color:#F97583">-></span><span style="color:#E1E4E8">488</span><span style="color:#B392F0">K</span><span style="color:#E1E4E8">(15872K), </span><span style="color:#79B8FF">0.0027909</span><span style="color:#E1E4E8"> secs] [Times</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> user</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.00</span><span style="color:#E1E4E8"> sys</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.00</span><span style="color:#E1E4E8">, real</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.00</span><span style="color:#E1E4E8"> secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">Heap</span></span>
+<span class="line"><span style="color:#E1E4E8"> PSYoungGen      total 4608K, used 1487K [</span><span style="color:#79B8FF">0x00000007bfb00000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  eden space 4096K, </span><span style="color:#79B8FF">24</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bfb00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfbfbcb0</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  from space 512K, </span><span style="color:#79B8FF">93</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff78000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff80000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  to   space 512K, </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bff80000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff80000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> ParOldGen       total 11264K, used 8K [</span><span style="color:#79B8FF">0x00000007bf000000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bfb00000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bfb00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  object space 11264K, </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bf000000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bf002000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfb00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> Metaspace       used 3641K, capacity 4606K, committed 4864K, reserved 1056768K</span></span>
+<span class="line"><span style="color:#F97583">  class</span><span style="color:#B392F0"> space</span><span style="color:#E1E4E8">    used 406K, capacity 430K, committed 512K, reserved 1048576K</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//  -Xmx15m -Xms15m -XX:-DoEscapeAnalysis -XX:+EliminateAllocations  -XX:+PrintGCDetails</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4096K->464K(4608K)] 4096K->472K(15872K), 0.0023558 secs] [Times: user=0.00 sys=0.00, real=0.01 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4560K->480K(4608K)] 4568K->488K(15872K), 0.0016919 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4576K->464K(4608K)] 4584K->480K(15872K), 0.0012115 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4560K->416K(4608K)] 4576K->440K(15872K), 0.0014123 secs] [Times: user=0.00 sys=0.00, real=0.01 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4512K->432K(4608K)] 4536K->456K(15872K), 0.0007827 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4528K->448K(4608K)] 4552K->472K(15872K), 0.0014156 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4544K->64K(4608K)] 4568K->469K(15872K), 0.0011911 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4160K->0K(3584K)] 4565K->429K(14848K), 0.0008173 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3072K->64K(4096K)] 3501K->493K(15360K), 0.0008980 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3136K->0K(4096K)] 3565K->429K(15360K), 0.0008181 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3072K->0K(4096K)] 3501K->429K(15360K), 0.0009510 secs] [Times: user=0.00 sys=0.00, real=0.01 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3072K->96K(4096K)] 3501K->525K(15360K), 0.0010059 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3168K->96K(4096K)] 3597K->549K(15360K), 0.0008356 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">time used: 32</span></span>
+<span class="line"><span style="color:#E1E4E8">Heap</span></span>
+<span class="line"><span style="color:#E1E4E8"> PSYoungGen      total 4096K, used 1733K [0x00000007bfb00000, 0x00000007c0000000, 0x00000007c0000000)</span></span>
+<span class="line"><span style="color:#E1E4E8">  eden space 3072K, 53% used [0x00000007bfb00000,0x00000007bfc996f8,0x00000007bfe00000)</span></span>
+<span class="line"><span style="color:#E1E4E8">  from space 1024K, 9% used [0x00000007bfe00000,0x00000007bfe18000,0x00000007bff00000)</span></span>
+<span class="line"><span style="color:#E1E4E8">  to   space 1024K, 0% used [0x00000007bff00000,0x00000007bff00000,0x00000007c0000000)</span></span>
+<span class="line"><span style="color:#E1E4E8"> ParOldGen       total 11264K, used 453K [0x00000007bf000000, 0x00000007bfb00000, 0x00000007bfb00000)</span></span>
+<span class="line"><span style="color:#E1E4E8">  object space 11264K, 4% used [0x00000007bf000000,0x00000007bf071498,0x00000007bfb00000)</span></span>
+<span class="line"><span style="color:#E1E4E8"> Metaspace       used 3635K, capacity 4606K, committed 4864K, reserved 1056768K</span></span>
+<span class="line"><span style="color:#F97583">  class</span><span style="color:#B392F0"> space</span><span style="color:#E1E4E8">    used 406K, capacity 430K, committed 512K, reserved 1048576K</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// -Xmx15m -Xms15m -XX:+DoEscapeAnalysis -XX:-EliminateAllocations  -XX:+PrintGCDetails</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4096K->464K(4608K)] 4096K->472K(15872K), 0.0012666 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4560K->496K(4608K)] 4568K->504K(15872K), 0.0007431 secs] [Times: user=0.00 sys=0.00, real=0.01 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4592K->480K(4608K)] 4600K->496K(15872K), 0.0005317 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4576K->432K(4608K)] 4592K->448K(15872K), 0.0005055 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4528K->448K(4608K)] 4544K->464K(15872K), 0.0004695 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 4544K->400K(3584K)] 4560K->416K(14848K), 0.0005831 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3472K->96K(4096K)] 3488K->497K(15360K), 0.0005897 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3168K->96K(4096K)] 3569K->513K(15360K), 0.0006654 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3168K->96K(4096K)] 3585K->513K(15360K), 0.0006979 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3168K->0K(4096K)] 3585K->433K(15360K), 0.0011842 secs] [Times: user=0.00 sys=0.00, real=0.01 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3072K->64K(4096K)] 3505K->497K(15360K), 0.0004890 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3136K->32K(4096K)] 3569K->465K(15360K), 0.0010702 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">[GC (Allocation Failure) [PSYoungGen: 3104K->0K(4096K)] 3537K->449K(15360K), 0.0010044 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">time used: 25</span></span>
+<span class="line"><span style="color:#E1E4E8">Heap</span></span>
+<span class="line"><span style="color:#E1E4E8"> PSYoungGen      total 4096K, used 2704K [0x00000007bfb00000, 0x00000007c0000000, 0x00000007c0000000)</span></span>
+<span class="line"><span style="color:#E1E4E8">  eden space 3072K, 88% used [0x00000007bfb00000,0x00000007bfda4070,0x00000007bfe00000)</span></span>
+<span class="line"><span style="color:#E1E4E8">  from space 1024K, 0% used [0x00000007bfe00000,0x00000007bfe00000,0x00000007bff00000)</span></span>
+<span class="line"><span style="color:#E1E4E8">  to   space 1024K, 0% used [0x00000007bff00000,0x00000007bff00000,0x00000007c0000000)</span></span>
+<span class="line"><span style="color:#E1E4E8"> ParOldGen       total 11264K, used 449K [0x00000007bf000000, 0x00000007bfb00000, 0x00000007bfb00000)</span></span>
+<span class="line"><span style="color:#E1E4E8">  object space 11264K, 3% used [0x00000007bf000000,0x00000007bf0704a8,0x00000007bfb00000)</span></span>
+<span class="line"><span style="color:#E1E4E8"> Metaspace       used 3086K, capacity 4502K, committed 4864K, reserved 1056768K</span></span>
+<span class="line"><span style="color:#F97583">  class</span><span style="color:#B392F0"> space</span><span style="color:#E1E4E8">    used 339K, capacity 390K, committed 512K, reserved 1048576K</span></span></code></pre>
+<p>由上运行结果可看出开启逃逸分析和标量替换后除了启动 jvm 时发生了一次 GC 其余时间都没有发生 GC，而关闭逃逸分析或者标量替换都会发生大量 GC，同时如果想完成程序栈上分配，则需要同时开始逃逸分析和标量替换。把运行内存参数调整放大<code>+Xms500m +Xmx500m</code> ，让程序睡眠 20s，此时都没有发生 GC,通过 jmap 查看程序的内存分布：</p>
+<p>开启逃逸分析和标量替换：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/09/image-20200909014422260.png" alt="逃逸分析"></p>
+<p>此时程序中只存在 68768 个 C 对象。关闭逃逸分析再次查看：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/09/image-20200909014627264.png" alt="逃逸分析"></p>
+<p>此时 C 实例对象有 1000000 个。</p>
+<h3 id="对象有现在-eden-区分配">对象有现在 Eden 区分配</h3>
+<p>大多数情况下，对象在新生代中 Eden 区分配。当 Eden 区没有足够空间进行分配时，虚拟机将发起一次Minor GC。</p>
+<ul>
+<li>
+<p><strong>Minor GC/Young GC</strong>：指发生新生代的的垃圾收集动作，Minor GC非常频繁，回收速度一般也比较快。</p>
+</li>
+<li>
+<p><strong>Major GC/Full GC</strong>：一般会回收老年代 ，年轻代，方法区的垃圾，Major GC的速度一般会比Minor GC的慢10倍以上。</p>
+</li>
+</ul>
+<p>大量的对象被分配在 Eden 区，Eden 区满了之后会触发 MinorGC，可能会有 99% 以上的对象成为垃圾被回收掉，剩余存活的对象会被挪到 survivor1 区，下一次eden区满了后又会触发minor gc，把eden区和survivor1区垃圾对象回收，把剩余存活的对象一次性挪动到另外一块为空的survivor2区，因为新生代的对象都是朝生夕死的，存活时间很短，所以JVM默认的8:1:1的比例是很合适的，<strong>让eden区尽量的大，survivor区够用即可</strong>。</p>
+<p>JVM默认有这个参数<code>-XX:+UseAdaptiveSizePolicy</code>(默认开启)，会导致这个8:1:1比例自动变化，如果不想这个比例有变化可以设置参数<code>-XX:-UseAdaptiveSizePolicy</code>。</p>
+<p>示例如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * -Xmx30m -Xms30m -XX:+PrintGCDetails</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> GCTest</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> final</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> _1MB </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1024</span><span style="color:#F97583"> *</span><span style="color:#79B8FF"> 1024</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        byte</span><span style="color:#E1E4E8">[] allocation1 </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#F97583"> byte</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> _1MB];</span></span>
+<span class="line"><span style="color:#F97583">        byte</span><span style="color:#E1E4E8">[] allocation2 </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#F97583"> byte</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> _1MB];</span></span>
+<span class="line"><span style="color:#F97583">        byte</span><span style="color:#E1E4E8">[] allocation3 </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#F97583"> byte</span><span style="color:#E1E4E8">[_1MB];</span></span>
+<span class="line"><span style="color:#F97583">        byte</span><span style="color:#E1E4E8">[] allocation4 </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#F97583"> byte</span><span style="color:#E1E4E8">[_1MB];</span></span>
+<span class="line"><span style="color:#6A737D">//        alloc();</span></span>
+<span class="line"><span style="color:#6A737D">//        byte[] allocation5 = new byte[_1MB];</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//    private static void alloc() {</span></span>
+<span class="line"><span style="color:#6A737D">//        byte[] allocation1 = new byte[2 * _1MB];</span></span>
+<span class="line"><span style="color:#6A737D">//        byte[] allocation2 = new byte[2 * _1MB];</span></span>
+<span class="line"><span style="color:#6A737D">//        byte[] allocation3 = new byte[_1MB];</span></span>
+<span class="line"><span style="color:#6A737D">//        byte[] allocation4 = new byte[_1MB];</span></span>
+<span class="line"><span style="color:#6A737D">//    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">--------------------------------------------------</span></span>
+<span class="line"><span style="color:#E1E4E8">Heap</span></span>
+<span class="line"><span style="color:#E1E4E8"> PSYoungGen      total 9216K, used 7816K [</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  eden space 8192K, </span><span style="color:#79B8FF">95</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfda22d8</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfe00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  from space 1024K, </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  to   space 1024K, </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bfe00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfe00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> ParOldGen       total 20480K, used 0K [</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  object space 20480K, </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> Metaspace       used 2973K, capacity 4496K, committed 4864K, reserved 1056768K</span></span>
+<span class="line"><span style="color:#F97583">  class</span><span style="color:#B392F0"> space</span><span style="color:#E1E4E8">    used 328K, capacity 388K, committed 512K, reserved 10</span></span></code></pre>
+<p>上述代码设置参数<code>-Xmx30m -Xms30m</code>根据虚拟机老年代和新生代默认比例为 2：1 可得知年轻代大小为 10MB，老年代为20MB。新生代中 Eden:s1:s1 = 8:1:1,其中 Eden 为 8MB，s1 为 1MB，另外s2 也为 1MB。在 allocation 1，2，3，4 申请内存时都在 eden 区进行分配。接下来再为 allocation5 申请内存，输出 GC 日志如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">[</span><span style="color:#B392F0">GC</span><span style="color:#E1E4E8"> (Allocation Failure) [PSYoungGen</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> 7652K</span><span style="color:#F97583">-></span><span style="color:#E1E4E8">592</span><span style="color:#B392F0">K</span><span style="color:#E1E4E8">(9216K)] 7652K</span><span style="color:#F97583">-></span><span style="color:#E1E4E8">6744</span><span style="color:#B392F0">K</span><span style="color:#E1E4E8">(29696K), </span><span style="color:#79B8FF">0.0049781</span><span style="color:#E1E4E8"> secs] [Times</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> user</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.03</span><span style="color:#E1E4E8"> sys</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.01</span><span style="color:#E1E4E8">, real</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.01</span><span style="color:#E1E4E8"> secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">Heap</span></span>
+<span class="line"><span style="color:#E1E4E8"> PSYoungGen      total 9216K, used 1782K [</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  eden space 8192K, </span><span style="color:#79B8FF">14</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bf7297f0</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfe00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  from space 1024K, </span><span style="color:#79B8FF">57</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bfe00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfe94010</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  to   space 1024K, </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> ParOldGen       total 20480K, used 6152K [</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  object space 20480K, </span><span style="color:#79B8FF">30</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007be802040</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> Metaspace       used 3024K, capacity 4496K, committed 4864K, reserved 1056768K</span></span>
+<span class="line"><span style="color:#F97583">  class</span><span style="color:#B392F0"> space</span><span style="color:#E1E4E8">    used 329K, capacity 388K, committed 512K, reserved 1048576K</span></span></code></pre>
+<p>此时 jvm 发生了一次 Minor GC，但是注意到老年代使用了 30% 的内存空间。因为给allocation5分配内存的时候eden区内存几乎已经被分配完了，当Eden区没有足够空间进行分配时，虚拟机将发起一次Minor GC，GC期间虚拟机又发现allocation1，2，3，4无法存入Survior空间，所以只好把新生代的对象<strong>提前转移到老年代</strong>中去，老年代上的空间足够存放allocation1-4，所以不会出现Full GC。如果把 allocation1-4 的内存分配动作封装到 <code>alloc()</code> 方法中，再次运行程序：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">[</span><span style="color:#B392F0">GC</span><span style="color:#E1E4E8"> (Allocation Failure) [PSYoungGen</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> 7652K</span><span style="color:#F97583">-></span><span style="color:#E1E4E8">592</span><span style="color:#B392F0">K</span><span style="color:#E1E4E8">(9216K)] 7652K</span><span style="color:#F97583">-></span><span style="color:#E1E4E8">600</span><span style="color:#B392F0">K</span><span style="color:#E1E4E8">(29696K), </span><span style="color:#79B8FF">0.0011807</span><span style="color:#E1E4E8"> secs] [Times</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> user</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.01</span><span style="color:#E1E4E8"> sys</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.00</span><span style="color:#E1E4E8">, real</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.00</span><span style="color:#E1E4E8"> secs]</span></span>
+<span class="line"><span style="color:#E1E4E8">Heap</span></span>
+<span class="line"><span style="color:#E1E4E8"> PSYoungGen      total 9216K, used 1782K [</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  eden space 8192K, </span><span style="color:#79B8FF">14</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bf729838</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfe00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  from space 1024K, </span><span style="color:#79B8FF">57</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bfe00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bfe94010</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  to   space 1024K, </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bff00000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> ParOldGen       total 20480K, used 8K [</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  object space 20480K, </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007be202000</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">0x00000007bf600000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> Metaspace       used 2973K, capacity 4496K, committed 4864K, reserved 1056768K</span></span>
+<span class="line"><span style="color:#F97583">  class</span><span style="color:#B392F0"> space</span><span style="color:#E1E4E8">    used 328K, capacity 388K, committed 512K, reserved 1048576K</span></span></code></pre>
+<p>可以发现之前的 allocation1-4 并没有进入老年代，已经被 GC 掉了。这也是为什么我们在写代码中尽量封装方法减少方法体大小的原因。</p>
+<h3 id="大对象直接进入老年代">大对象直接进入老年代</h3>
+<p>大对象就是需要大量连续内存空间的对象（比如：字符串、数组）。JVM参数 <code>-XX:PretenureSizeThreshold</code> 可以设置大对象的大小，如果对象超过设置大小会直接进入老年代，不会进入年轻代，这个参数只在 <strong>Serial</strong> 和 <strong>ParNew</strong> 两个收集器下有效。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * -Xmx30m -Xms30m -XX:+PrintGCDetails -XX:+UseConcMarkSweepGC -XX:PretenureSizeThreshold=3145728</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> BigObj</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> final</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> _1MB </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1024</span><span style="color:#F97583"> *</span><span style="color:#79B8FF"> 1024</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        byte</span><span style="color:#E1E4E8">[] b </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#F97583"> byte</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">3</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> _1MB ];</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">---------------------------------------------------------</span></span>
+<span class="line"><span style="color:#E1E4E8">Heap</span></span>
+<span class="line"><span style="color:#E1E4E8"> par </span><span style="color:#F97583">new</span><span style="color:#E1E4E8"> generation   total 9216K, used 1673K [</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bec00000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bec00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  eden space 8192K,  </span><span style="color:#79B8FF">20</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007be200000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007be3a2458</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bea00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  from space 1024K,   </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007bea00000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bea00000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007beb00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  to   space 1024K,   </span><span style="color:#79B8FF">0</span><span style="color:#F97583">%</span><span style="color:#E1E4E8"> used [</span><span style="color:#79B8FF">0x00000007beb00000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007beb00000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007bec00000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> concurrent mark</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">sweep generation total 20480K, used 3072K [</span><span style="color:#79B8FF">0x00000007bec00000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0x00000007c0000000</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8"> Metaspace       used 2972K, capacity 4496K, committed 4864K, reserved 1056768K</span></span>
+<span class="line"><span style="color:#F97583">  class</span><span style="color:#B392F0"> space</span><span style="color:#E1E4E8">    used 328K, capacity 388K, committed 512K, reserved 1048576K</span></span></code></pre>
+<p><code>-XX:+UseConcMarkSweepGC</code>参数意味着在老年代使用 cms 垃圾收集器，此时 jvm 默认的年轻代垃圾收集器为<code>ParNew</code>收集器，可以省略<code>-XX:+UseParNewGC</code>参数。通过上述代码示例可以看出 byte[] b 直接进入了老年代，占用了 3072KB的空间，正好与我们 new 出来的 3M 大小相同。</p>
+<p>大对象直接在老年代分配的目的是避免在 Eden区和两个 survivor 区进行大量的复制。</p>
+<h3 id="长期存活的对象进入老年代">长期存活的对象进入老年代</h3>
+<p>虚拟机采用了分代收集的思想来管理内存，那么内存回收时就必须能识别哪些对象应该放在新生代，哪些对象应该放在老年代中。为了做到这一点，虚拟机给每个对象一个对象年龄（Age）计数器。如果在 Eden 出生并经过第一次 Minor GC 后仍然能够存活，并且能被 Survivor 容纳的话，将被移动到 Survivor 空间中，并将对象年龄设为 1。对象在 Survivor 中没熬过一次 Minor GC, 年龄就增加一岁，当它的年龄增加到一定程度（默认 15 岁，CMS 收集器默认为 6 岁，不同的垃圾收集器会稍微有些不同），就会被晋升到老年代中。对象晋升到老年代的年龄阈值，可以通过<code>-XX:MaxTenuringThreshold</code>来设置。</p>
+<h3 id="动态对象年龄判断">动态对象年龄判断</h3>
+<p>当前放对象的Survivor区域里(其中一块区域，放对象的那块s区)，一批对象的总大小大于这块Survivor区域内存大小的50%(-XX:TargetSurvivorRatio可以指定)，那么此时<strong>大于等于</strong>这批对象年龄最大值的对象，就可以直接进入老年代了，例如Survivor区域里现在有一批对象，年龄1+年龄2+年龄n的多个年龄对象总和超过了Survivor区域的50%，此时就会把年龄n(含)以上的对象都放入老年代。这个规则其实是希望那些可能是长期存活的对象，尽早进入老年代。<strong>对象动态年龄判断机制一般是在minor gc之后触发的</strong>。</p>
+<h3 id="老年代空间分配担保机制">老年代空间分配担保机制</h3>
+<p>在每次 Minor GC 之前，虚拟机会检查老年代最大连续可用空间是否大于新生代所有对象（包括垃圾对象）总空间，如果大于则说明此次 Minor GC 是安全的。如果不大于，虚拟机会检查 HandlePromotionFailure 设置的值是否允许担保失败，如果不允许，则进行一次 Full GC，如果允许，则检查老年代最大可用连续空间是否大于历次晋升到老年代对象的平均大小，如果大于，尝试进行一次 Minor GC，如果小于改为进行一次 Full GC。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/09/09/image-20200909170646617.png" alt="空间分配担保机制"></p>
+<h3 id="内存分配流程">内存分配流程</h3>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/2020/09/09/image-20200909180425796.png" alt="内存分配流程"></p>
+<h2 id="对象的内存回收">对象的内存回收</h2>
+<p>对象创建使用完成之后，需要被垃圾收集进行回收以释放内存空间。在回收之前，第一件事就是要确定这些对象中哪些还“存活着”，哪些已经“死去”。</p>
+<h3 id="引用计数算法">引用计数算法</h3>
+<p>给对象添加一个引用计数器，每当一个地方引用它时，计数器的值就加 1；当引用失效时，计数器的值就减1；任何时刻计数器为 0 的对象就是不可能在被使用的。</p>
+<p>**引用计数算法（Reference Counting）的实现简单，判定效率也很高，但是目前主流虚拟机中并没有选择这个算法来管理内存，其最主要的原因是它很难解决对象之前相互循环引用的问题。**所谓对象之间的相互引用问题，如下面代码所示：除了对象a 和 b 相互引用着对方之外，这两个对象之间再无任何引用。但是他们因为互相引用对方，导致它们的引用计数器都不为0，于是引用计数算法无法通知 GC 回收器回收他们。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> ReferenceCounting</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    Object instance </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        ReferenceCounting a </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ReferenceCounting</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        ReferenceCounting b </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ReferenceCounting</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        a.instance </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> b;</span></span>
+<span class="line"><span style="color:#E1E4E8">        b.instance </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> a;</span></span>
+<span class="line"><span style="color:#E1E4E8">        a </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        b </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="可达性分析算法">可达性分析算法</h3>
+<p>可达性分析(Reachability Analysis)的基本思路就是通过一系列的成为<code>GC Roots</code>的对象为起点，从这些节点开始向下搜索，搜索所走过的路径称为<code>引用链</code>(Refernce Chain)，当一个独享到 GC Roots 没有任何引用链相连（用图论的话来说，就是从 GC Roots到这个对象不可达）时，则证明此对象是不可用的。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/09/image-20200909202306970.png" alt="可达性分析"></p>
+<p>在 Java 中，可作为 GC Roots的对象包括下面几种：</p>
+<ul>
+<li>虚拟机栈（栈中变量表）中的引用对象</li>
+<li>方法区中类静态属性引用的对象</li>
+<li>方法区中常量引用的对象</li>
+<li>本地方法栈中 JNI(Native)方法引用的对象。</li>
+</ul>
+<h3 id="对象引用类型">对象引用类型</h3>
+<p>java的引用类型一般分为四种：<strong>强引用</strong>、<strong>软引用</strong>、弱引用、虚引用</p>
+<h4 id="强引用">强引用</h4>
+<p>普通的变量引用，类似<code>Object obj = new Object()</code>这类的引用，只要强引用还存在，垃圾收集器永远不会回收掉被引用的对象。</p>
+<h4 id="软引用">软引用</h4>
+<p>用来描述一些还有用但并非必需的对象。该类对象正确情况下不会被回收，但是 GC 做完后发现释放不出空间存放新的对象，则会把这些对象回收掉。<strong>软引用可用来实现内存敏感的高速缓存</strong>。在JDK 1.2之后，提供了<code>SoftReference</code>类来实现弱引用。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> static</span><span style="color:#E1E4E8"> SoftReference&#x3C;</span><span style="color:#F97583">User</span><span style="color:#E1E4E8">> user </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> SoftReference&#x3C;</span><span style="color:#F97583">User</span><span style="color:#E1E4E8">>(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> User</span><span style="color:#E1E4E8">());</span></span></code></pre>
+<h4 id="弱引用">弱引用</h4>
+<p>弱引用也是用来描述非必需对象的，但是它的强度比软引用更弱一些，被弱引用关联的对象只能生存到下一次垃圾收集发生之前。当垃圾收集器工作时，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。在JDK 1.2之后，提供了<code>WeakReference</code>类来实现弱引用。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> static</span><span style="color:#E1E4E8"> WeakReference&#x3C;</span><span style="color:#F97583">User</span><span style="color:#E1E4E8">> user </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> WeakReference&#x3C;</span><span style="color:#F97583">User</span><span style="color:#E1E4E8">>(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> User</span><span style="color:#E1E4E8">());</span></span></code></pre>
+<h4 id="虚引用">虚引用</h4>
+<p>虚引用也称为幽灵引用或者幻影引用，它是最弱的一种引用关系，几乎不用</p>
+<h3 id="finalize-方法">finalize 方法</h3>
+<p>即使在可达性分析算法中不可达的对象，也并非是“非死不可”的，这时候它们暂时处于“缓刑”阶段，要真正宣告一个对象死亡，至少要经历再次标记过程。</p>
+<p><strong>标记的前提是对象在进行可达性分析后发现没有与GC Roots相连接的引用链。</strong></p>
+<ol>
+<li>
+<p><strong>第一次标记并进行一次筛选。</strong></p>
+<p>筛选的条件是此对象是否有必要执行finalize()方法。 当对象没有覆盖finalize方法，对象将直接被回收。</p>
+</li>
+<li>
+<p><strong>第二次标记</strong></p>
+<p>如果这个对象覆盖了finalize方法，finalize方法是对象脱逃死亡命运的最后一次机会，如果对象要在finalize()中成功拯救自己，只要重新与引用链上的任何的一个对象建立关联即可，譬如把自己赋值给某个类变量或对象的成员变量，那在第二次标记时它将移除出“即将回收”的集合。如果对象这时候还没逃脱，那基本上它就真的被回收了。</p>
+</li>
+</ol>
+<blockquote>
+<p>注意：一个对象的finalize()方法只会被执行一次，也就是说通过调用finalize方法自我救命的机会就一次。</p>
+<p><strong>如何判断一个类是无用的类</strong></p>
+<p>方法区主要回收的是无用的类，那么如何判断一个类是无用的类的呢？</p>
+<p>类需要同时满足下面3个条件才能算是 <strong>“无用的类”</strong> ：</p>
+<ul>
+<li>
+<p>该类所有的实例都已经被回收，也就是 Java 堆中不存在该类的任何实例。</p>
+</li>
+<li>
+<p>加载该类的 ClassLoader 已经被回收。</p>
+</li>
+<li>
+<p>该类对应的 java.lang.Class 对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。</p>
+</li>
+</ul>
+</blockquote>
+<h2 id="参考文章">参考文章：</h2>
+<p><a href="https://juejin.im/post/6844904054561193992">Java的对象模型——Oop-Klass模型（一）</a></p>
+<p><a href="https://juejin.im/post/6844904055421009928">Java的对象模型——Oop-Klass模型（二）</a></p>
+<p><a href="https://www.zhihu.com/question/50258991/answer/120450561">JVM符号引用转换直接引用的过程?</a></p>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885504/"><span>上一篇</span><strong>从源码角度理解类加载器</strong></a> <a href="/post/164885416/"><span>下一篇</span><strong>一、C语言简介</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885504/"> <span>2020/08/21 · JVM</span> <strong>从源码角度理解类加载器</strong> </a><a href="/post/164885508/"> <span>2020/08/14 · JVM</span> <strong>类加载过程</strong> </a><a href="/post/164885506/"> <span>2020/08/10 · JVM</span> <strong>字节码文件结构详解</strong> </a> </div> </section> </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-2" href="#对象的创建">对象的创建</a><a class="toc-depth-3" href="#对象创建的主要流程">对象创建的主要流程</a><a class="toc-depth-3" href="#类加载检查">类加载检查</a><a class="toc-depth-3" href="#分配内存">分配内存</a><a class="toc-depth-3" href="#对象初始化">对象初始化</a><a class="toc-depth-3" href="#设置对象头">设置对象头</a><a class="toc-depth-3" href="#执行方法">执行方法</a><a class="toc-depth-2" href="#对象的内存布局">对象的内存布局</a><a class="toc-depth-3" href="#oop-klass-model">OOP-Klass Model</a><a class="toc-depth-3" href="#对象头">对象头</a><a class="toc-depth-3" href="#实例数据">实例数据</a><a class="toc-depth-3" href="#对齐填充">对齐填充</a><a class="toc-depth-3" href="#指针压缩">指针压缩</a><a class="toc-depth-2" href="#对象的访问定位">对象的访问定位</a><a class="toc-depth-3" href="#直接指针">直接指针</a><a class="toc-depth-3" href="#句柄访问">句柄访问</a><a class="toc-depth-2" href="#对象的内存分配">对象的内存分配</a><a class="toc-depth-3" href="#对象栈上分配">对象栈上分配</a><a class="toc-depth-3" href="#对象有现在-eden-区分配">对象有现在 Eden 区分配</a><a class="toc-depth-3" href="#大对象直接进入老年代">大对象直接进入老年代</a><a class="toc-depth-3" href="#长期存活的对象进入老年代">长期存活的对象进入老年代</a><a class="toc-depth-3" href="#动态对象年龄判断">动态对象年龄判断</a><a class="toc-depth-3" href="#老年代空间分配担保机制">老年代空间分配担保机制</a><a class="toc-depth-3" href="#内存分配流程">内存分配流程</a><a class="toc-depth-2" href="#对象的内存回收">对象的内存回收</a><a class="toc-depth-3" href="#引用计数算法">引用计数算法</a><a class="toc-depth-3" href="#可达性分析算法">可达性分析算法</a><a class="toc-depth-3" href="#对象引用类型">对象引用类型</a><a class="toc-depth-3" href="#finalize-方法">finalize 方法</a><a class="toc-depth-2" href="#参考文章">参考文章：</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

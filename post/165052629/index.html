@@ -1,0 +1,205 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="在并发理论基础：Java 内存模型JMM一文中讲到 JMM 模型是 Java 抽象出来的一个概念，用来屏蔽不同硬件和操作系统对于内存访问的差异，让 Java 程序能在不同平台上达到一致的运行效果。规范了 JVM 与计算机内存如何系统工作，规定了一个线程如何和何时可以看到其他线程修改后的共享变量的值，以及如何将共享..."><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>深入理解Volatile | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/并发编程/">并发编程</a> <span>2022/04/21</span>  <span>4 分钟阅读</span> </div> <h1>深入理解Volatile</h1>  <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/并发/">
+#并发 </a><a class="article-tag-link" href="/tags/Java/">
+#Java </a> </div> </header> <div class="prose" data-pagefind-body>  <p>在<a href="/post/164995635/">并发理论基础：Java 内存模型JMM</a>一文中讲到 JMM 模型是 Java 抽象出来的一个概念，用来屏蔽不同硬件和操作系统对于内存访问的差异，让 Java 程序能在不同平台上达到一致的运行效果。规范了 JVM 与计算机内存如何系统工作，规定了一个线程如何和何时可以看到其他线程修改后的共享变量的值，以及如何将共享变量的值写入主存。JMM 围绕原子性，可见性和有序性展开的，其实现的核心主要包括<code>volatile</code>,<code>synchronized</code>和<code>final</code>关键字以及几项<code>happen-before</code>原则。本文就<code>volatile</code>如何在 JMM 中的作用以及实现原理展开讨论。</p>
+<h2 id="volatile的特性">volatile的特性</h2>
+<p>JMM是围绕原子性、可见性、有序性展开的。<code>volatile</code> 是 JMM 实现的一个核心之一，讨论volatile 在 JMM 中的作用也需要围绕原子性、可见性、有序性这三个方面来展开。</p>
+<h3 id="可见性">可见性</h3>
+<p>根据<a href="http://www.cs.umd.edu/~pugh/java/memoryModel/jsr-133-faq.html">JSR-133 FAQ</a>中的说明，volatile字段是用于在线程之间传递状态的特殊字段。<strong>每次读取volatile时，都会看到任意一个线程对该volatile的最后一次写入</strong>。 实际上，程序员将volatile字段指定为不能接受由于缓存或重排序而导致的“过时”值的字段。禁止编译器和运行时在寄存器中分配它们。它们还必须确保在写入后将其从高速缓存（cache）中刷新到主存(memory)，以便它们可以立即对其他线程可见。 同样，在读取volatile字段之前，必须使高速缓存无效，以便可以看到主内存中的值而不是本地处理器高速缓存中的值。</p>
+<p>同时<a href="https://docs.oracle.com/javase/specs/index.html">The Java Language Specification</a>也规定了对于<code>volatile</code>修饰的共享变量，在多个线程中的可见性<a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.3.1.4">volatile Fields</a>。</p>
+<blockquote>
+<p>A field may be declared <code>volatile</code>, in which case the Java Memory Model ensures that all threads see a consistent value for the variable (<a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-17.html#jls-17.4">§17.4</a>).</p>
+</blockquote>
+<p><strong>volatile内存读写语义</strong></p>
+<ul>
+<li>
+<p>当写一个volatile变量时，JMM会把该线程对应的本地内存中的共享变量值刷新到主内存。</p>
+</li>
+<li>
+<p>当读一个volatile变量时，JMM会把该线程对应的本地内存置为无效，线程接下来将从主内存中 读取共享变量。</p>
+</li>
+</ul>
+<p><strong>也就是说每次读取volatile都是从主存读取，写入也会刷新到主存，因而保证了不同线程拿到的都是最新值，即保证了共享资源对各个CPU上的线程的可见性，这其实就是保证了缓存一致性。</strong></p>
+<blockquote>
+<p>关于本地内存、主存、JVM 内存结构和计算硬件内存的关系可参考<a href="/post/164995635/">并发理论基础：Java 内存模型JMM</a></p>
+</blockquote>
+<h3 id="原子性">原子性</h3>
+<p><strong>对任意单个volatile变量的读/写具有原子性，但类似于volatile++这种复合操作不具有原子性</strong>(基于这点，我们通过会认为volatile不具备原子性)。volatile仅仅保证对单个volatile变量的读/写具有原子性，而锁的互斥执行的特性可以确保对整个临界区代码的执行具有原子性。</p>
+<p>JVM 在 64 位<code>long</code>和<code>double</code>的读写操作具体是原子性实现还是分段读（效率原因）写没有做明确的规定，但是建议在定义全局的 long 或者 double 变量时声明为<code>volatile</code>来避免并发问题。具体内容可查看<a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-17.html#jls-17.7">Non-atomic Treatment of double and long</a>。</p>
+<h3 id="有序性">有序性</h3>
+<p><code>volatile</code>是通过禁止指令重排序来保证有序性的。指令重排序有两种：</p>
+<ul>
+<li>编译器重排序</li>
+<li>CPU 指令集重排序</li>
+</ul>
+<p>关于禁止编译器重排还是以一段代码来进行对比：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> CompilerOutOrdering</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> field1;</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> field2;</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> field3;</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> field4;</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> field5;</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> field6;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> assign</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> i</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        field1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        field2 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        field3 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#79B8FF"> 3</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        field4 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#79B8FF"> 4</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        field5 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#79B8FF"> 5</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        field6 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#79B8FF"> 6</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throws</span><span style="color:#E1E4E8"> Exception {</span></span>
+<span class="line"><span style="color:#F97583">        for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 10000</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">            assign</span><span style="color:#E1E4E8">(i);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">        Thread.</span><span style="color:#B392F0">sleep</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1000</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span></code></pre>
+<p>上面代码经过 JIT 编译后的汇编如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/2022/04/image-20220420205006346.png" alt="汇编代码"></p>
+<p>可以看出源码和字节码顺序保持一致，而汇编赋值变成了 1，6，5，4，3，2。</p>
+<p>把 1 和 6 加上 volatile 关键字修饰：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/2022/04/image-20220420205248483.png" alt="volatile 修饰后汇编"></p>
+<p>汇编变成了 1 始终第一个赋值，6 始终最后一个赋值，但是 1 和 6 之间的顺序不保证。</p>
+<h2 id="volatile-实现">volatile 实现</h2>
+<h3 id="jmm内存交互层面实现">JMM内存交互层面实现</h3>
+<p>volatile修饰的变量的read、load、use操作和assign、store、write必须是连续的，即修改后必须立 即同步回主内存，使用时必须从主内存刷新，由此保证volatile变量操作对多线程的可见性。</p>
+<h3 id="硬件层面实现">硬件层面实现</h3>
+<p>通过lock前缀指令，会锁定变量缓存行区域并写回主内存，这个操作称为“缓存锁定”，缓存一致性机制会阻止同时修改被两个以上处理器缓存的内存区域数据。一个处理器的缓存回写到内存会导致其他处理器的缓存无效。关于 lock 指令也可以通过上图的汇编代码可以看到。</p>
+<p>关于缓存锁定可以查看<a href="/post/164926797/">并发理论基础：缓存可见性、MESI</a>。</p>
+<p>关于 lock 指令可以查看<a href="/post/165052618/">并发理论接触：内存屏障</a>。</p>
+<h3 id="volatile在hotspot的实现">volatile在hotspot的实现</h3>
+<h4 id="字节码解释器实现">字节码解释器实现</h4>
+<p>JVM中的字节码解释器(bytecodeInterpreter)，用C++实现了JVM指令，其优点是实现相对简单且容易理解，缺点是执行慢。</p>
+<p><code>bytecodeInterpreter.cpp</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">          int</span><span style="color:#E1E4E8"> field_offset </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> cache</span><span style="color:#F97583">-></span><span style="color:#B392F0">f2_as_index</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">          if</span><span style="color:#E1E4E8"> (cache</span><span style="color:#F97583">-></span><span style="color:#B392F0">is_volatile</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#F97583">            if</span><span style="color:#E1E4E8"> (tos_type </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> itos) {</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_int_field_put</span><span style="color:#E1E4E8">(field_offset, </span><span style="color:#B392F0">STACK_INT</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (tos_type </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> atos) {</span></span>
+<span class="line"><span style="color:#B392F0">              VERIFY_OOP</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">STACK_OBJECT</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_obj_field_put</span><span style="color:#E1E4E8">(field_offset, </span><span style="color:#B392F0">STACK_OBJECT</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (tos_type </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> btos) {</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_byte_field_put</span><span style="color:#E1E4E8">(field_offset, </span><span style="color:#B392F0">STACK_INT</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (tos_type </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> ztos) {</span></span>
+<span class="line"><span style="color:#F97583">              int</span><span style="color:#E1E4E8"> bool_field </span><span style="color:#F97583">=</span><span style="color:#B392F0"> STACK_INT</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span><span style="color:#6A737D">  // only store LSB</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_byte_field_put</span><span style="color:#E1E4E8">(field_offset, (bool_field </span><span style="color:#F97583">&#x26;</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (tos_type </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> ltos) {</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_long_field_put</span><span style="color:#E1E4E8">(field_offset, </span><span style="color:#B392F0">STACK_LONG</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (tos_type </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> ctos) {</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_char_field_put</span><span style="color:#E1E4E8">(field_offset, </span><span style="color:#B392F0">STACK_INT</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (tos_type </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> stos) {</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_short_field_put</span><span style="color:#E1E4E8">(field_offset, </span><span style="color:#B392F0">STACK_INT</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (tos_type </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> ftos) {</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_float_field_put</span><span style="color:#E1E4E8">(field_offset, </span><span style="color:#B392F0">STACK_FLOAT</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">              obj-></span><span style="color:#B392F0">release_double_field_put</span><span style="color:#E1E4E8">(field_offset, </span><span style="color:#B392F0">STACK_DOUBLE</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#B392F0">            OrderAccess::storeload</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">          } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">            .......</span></span>
+<span class="line"><span style="color:#E1E4E8">          }</span></span></code></pre>
+<p>可以看到主要是通过 <code>storeload</code> 屏障实现的。而在不同的处理器中 <code>storeload</code> 实现的指令不同：</p>
+<p>例如在 linux_x8下 <code>orderAccess_linux_x86.hpp</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583">inline</span><span style="color:#F97583"> void</span><span style="color:#E1E4E8"> OrderAccess::</span><span style="color:#B392F0">storeload</span><span style="color:#E1E4E8">()  { </span><span style="color:#B392F0">fence</span><span style="color:#E1E4E8">();            }</span></span>
+<span class="line"><span style="color:#E1E4E8">......</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">inline</span><span style="color:#F97583"> void</span><span style="color:#E1E4E8"> OrderAccess::</span><span style="color:#B392F0">fence</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D">   // always use locked addl since mfence is sometimes expensive</span></span>
+<span class="line"><span style="color:#F97583">#ifdef</span><span style="color:#B392F0"> AMD64</span></span>
+<span class="line"><span style="color:#F97583">  __asm__</span><span style="color:#F97583"> volatile</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">"</span><span style="color:#9ECBFF">lock; addl $0,0(%%rsp)</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8"> : : : </span><span style="color:#9ECBFF">"</span><span style="color:#9ECBFF">cc</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"</span><span style="color:#9ECBFF">memory</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">#else</span></span>
+<span class="line"><span style="color:#F97583">  __asm__</span><span style="color:#F97583"> volatile</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">"</span><span style="color:#9ECBFF">lock; addl $0,0(%%esp)</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8"> : : : </span><span style="color:#9ECBFF">"</span><span style="color:#9ECBFF">cc</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"</span><span style="color:#9ECBFF">memory</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">#endif</span></span>
+<span class="line"><span style="color:#B392F0">  compiler_barrier</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">......</span></span>
+<span class="line"><span style="color:#6A737D">// A compiler barrier, forcing the C++ compiler to invalidate all memory assumptions</span></span>
+<span class="line"><span style="color:#F97583">static</span><span style="color:#F97583"> inline</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> compiler_barrier</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  __asm__</span><span style="color:#F97583"> volatile</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">""</span><span style="color:#E1E4E8"> : : : </span><span style="color:#9ECBFF">"</span><span style="color:#9ECBFF">memory</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>通过 lock 指令以及 <code>compiler_barrier</code>禁止 CPU 和编译器指令重排。</p>
+<h4 id="模板解释器实现">模板解释器实现</h4>
+<p>模板解释器(templateInterpreter)，其对每个指令都写了一段对应的汇编代码，启动时将每个指令与对应 汇编代码入口绑定，可以说是效率做到了极致。</p>
+<p><code>templateTable_x86.cpp</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#6A737D">// 负责执行putfield或putstatic指令</span></span>
+<span class="line"><span style="color:#F97583">void</span><span style="color:#E1E4E8"> TemplateTable::</span><span style="color:#B392F0">putfield_or_static</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> byte_no</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">bool</span><span style="color:#FFAB70"> is_static</span><span style="color:#E1E4E8">, RewriteControl </span><span style="color:#FFAB70">rc</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  transition</span><span style="color:#E1E4E8">(vtos, vtos);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  ......</span></span>
+<span class="line"><span style="color:#B392F0">  volatile_barrier</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">Assembler::Membar_mask_bits</span><span style="color:#E1E4E8">(Assembler::StoreLoad </span><span style="color:#F97583">|</span></span>
+<span class="line"><span style="color:#E1E4E8">                                               Assembler::StoreStore));</span></span>
+<span class="line"><span style="color:#E1E4E8">  ......</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ----------------------------------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A737D">// Volatile variables demand their effects be made known to all CPU's</span></span>
+<span class="line"><span style="color:#6A737D">// in order.  Store buffers on most chips allow reads &#x26; writes to</span></span>
+<span class="line"><span style="color:#6A737D">// reorder; the JMM's ReadAfterWrite.java test fails in -Xint mode</span></span>
+<span class="line"><span style="color:#6A737D">// without some kind of memory barrier (i.e., it's not sufficient that</span></span>
+<span class="line"><span style="color:#6A737D">// the interpreter does not reorder volatile references, the hardware</span></span>
+<span class="line"><span style="color:#6A737D">// also must not reorder them).</span></span>
+<span class="line"><span style="color:#6A737D">//</span></span>
+<span class="line"><span style="color:#6A737D">// According to the new Java Memory Model (JMM):</span></span>
+<span class="line"><span style="color:#6A737D">// (1) All volatiles are serialized wrt to each other.  ALSO reads &#x26;</span></span>
+<span class="line"><span style="color:#6A737D">//     writes act as aquire &#x26; release, so:</span></span>
+<span class="line"><span style="color:#6A737D">// (2) A read cannot let unrelated NON-volatile memory refs that</span></span>
+<span class="line"><span style="color:#6A737D">//     happen after the read float up to before the read.  It's OK for</span></span>
+<span class="line"><span style="color:#6A737D">//     non-volatile memory refs that happen before the volatile read to</span></span>
+<span class="line"><span style="color:#6A737D">//     float down below it.</span></span>
+<span class="line"><span style="color:#6A737D">// (3) Similar a volatile write cannot let unrelated NON-volatile</span></span>
+<span class="line"><span style="color:#6A737D">//     memory refs that happen BEFORE the write float down to after the</span></span>
+<span class="line"><span style="color:#6A737D">//     write.  It's OK for non-volatile memory refs that happen after the</span></span>
+<span class="line"><span style="color:#6A737D">//     volatile write to float up before it.</span></span>
+<span class="line"><span style="color:#6A737D">//</span></span>
+<span class="line"><span style="color:#6A737D">// We only put in barriers around volatile refs (they are expensive),</span></span>
+<span class="line"><span style="color:#6A737D">// not _between_ memory refs (that would require us to track the</span></span>
+<span class="line"><span style="color:#6A737D">// flavor of the previous memory refs).  Requirements (2) and (3)</span></span>
+<span class="line"><span style="color:#6A737D">// require some barriers before volatile stores and after volatile</span></span>
+<span class="line"><span style="color:#6A737D">// loads.  These nearly cover requirement (1) but miss the</span></span>
+<span class="line"><span style="color:#6A737D">// volatile-store-volatile-load case.  This final case is placed after</span></span>
+<span class="line"><span style="color:#6A737D">// volatile-stores although it could just as well go before</span></span>
+<span class="line"><span style="color:#6A737D">// volatile-loads.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">void</span><span style="color:#E1E4E8"> TemplateTable::</span><span style="color:#B392F0">volatile_barrier</span><span style="color:#E1E4E8">(Assembler::Membar_mask_bits </span><span style="color:#FFAB70">order_constraint</span><span style="color:#E1E4E8"> ) {</span></span>
+<span class="line"><span style="color:#6A737D">  // Helper function to insert a is-volatile test and memory barrier</span></span>
+<span class="line"><span style="color:#E1E4E8">  __ </span><span style="color:#B392F0">membar</span><span style="color:#E1E4E8">(order_constraint);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><code>assembler_x86.hpp</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#F97583"> void</span><span style="color:#E1E4E8">  (Membar_mask_bits order_constraint) {</span></span>
+<span class="line"><span style="color:#6A737D">    // We only have to handle StoreLoad x86平台只需要处理StoreLoad</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (order_constraint </span><span style="color:#F97583">&#x26;</span><span style="color:#E1E4E8"> StoreLoad) {</span></span>
+<span class="line"><span style="color:#6A737D">      // All usable chips support "locked" instructions which suffice</span></span>
+<span class="line"><span style="color:#6A737D">      // as barriers, and are much faster than the alternative of</span></span>
+<span class="line"><span style="color:#6A737D">      // using cpuid instruction. We use here a locked add [esp-C],0.</span></span>
+<span class="line"><span style="color:#6A737D">      // This is conveniently otherwise a no-op except for blowing</span></span>
+<span class="line"><span style="color:#6A737D">      // flags, and introducing a false dependency on target memory</span></span>
+<span class="line"><span style="color:#6A737D">      // location. We can't do anything with flags, but we can avoid</span></span>
+<span class="line"><span style="color:#6A737D">      // memory dependencies in the current method by locked-adding</span></span>
+<span class="line"><span style="color:#6A737D">      // somewhere else on the stack. Doing [esp+C] will collide with</span></span>
+<span class="line"><span style="color:#6A737D">      // something on stack in current method, hence we go for [esp-C].</span></span>
+<span class="line"><span style="color:#6A737D">      // It is convenient since it is almost always in data cache, for</span></span>
+<span class="line"><span style="color:#6A737D">      // any small C.  We need to step back from SP to avoid data</span></span>
+<span class="line"><span style="color:#6A737D">      // dependencies with other things on below SP (callee-saves, for</span></span>
+<span class="line"><span style="color:#6A737D">      // example). Without a clear way to figure out the minimal safe</span></span>
+<span class="line"><span style="color:#6A737D">      // distance from SP, it makes sense to step back the complete</span></span>
+<span class="line"><span style="color:#6A737D">      // cache line, as this will also avoid possible second-order effects</span></span>
+<span class="line"><span style="color:#6A737D">      // with locked ops against the cache line. Our choice of offset</span></span>
+<span class="line"><span style="color:#6A737D">      // is bounded by x86 operand encoding, which should stay within</span></span>
+<span class="line"><span style="color:#6A737D">      // [-128; +127] to have the 8-byte displacement encoding.</span></span>
+<span class="line"><span style="color:#6A737D">      //</span></span>
+<span class="line"><span style="color:#6A737D">      // Any change to this code may need to revisit other places in</span></span>
+<span class="line"><span style="color:#6A737D">      // the code where this idiom is used, in particular the</span></span>
+<span class="line"><span style="color:#6A737D">      // orderAccess code.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">      int</span><span style="color:#E1E4E8"> offset </span><span style="color:#F97583">=</span><span style="color:#F97583"> -</span><span style="color:#B392F0">VM_Version::L1_line_size</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (offset </span><span style="color:#F97583">&#x3C;</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">128</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        offset </span><span style="color:#F97583">=</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">128</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">     // 下面这两句插入了一条lock前缀指令: lock addl $0, $0(%rsp)</span></span>
+<span class="line"><span style="color:#B392F0">      lock</span><span style="color:#E1E4E8">();</span><span style="color:#6A737D">  // lock前缀指令</span></span>
+<span class="line"><span style="color:#B392F0">      addl</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">Address</span><span style="color:#E1E4E8">(rsp, offset), </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span><span style="color:#6A737D">// Assert the lock# signal here  // addl $0, $0(%rsp)</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span></code></pre>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/165052618/"><span>上一篇</span><strong>并发理论接触：内存屏障</strong></a> <span></span> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/165052618/"> <span>2022/04/21 · 并发编程</span> <strong>并发理论接触：内存屏障</strong> </a><a href="/post/164995635/"> <span>2022/04/15 · 并发编程</span> <strong>并发理论基础：Java 内存模型JMM</strong> </a><a href="/post/164942290/"> <span>2022/04/08 · 并发编程</span> <strong>并发理论基础：指令重排序问题</strong> </a> </div> </section> </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-2" href="#volatile的特性">volatile的特性</a><a class="toc-depth-3" href="#可见性">可见性</a><a class="toc-depth-3" href="#原子性">原子性</a><a class="toc-depth-3" href="#有序性">有序性</a><a class="toc-depth-2" href="#volatile-实现">volatile 实现</a><a class="toc-depth-3" href="#jmm内存交互层面实现">JMM内存交互层面实现</a><a class="toc-depth-3" href="#硬件层面实现">硬件层面实现</a><a class="toc-depth-3" href="#volatile在hotspot的实现">volatile在hotspot的实现</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>

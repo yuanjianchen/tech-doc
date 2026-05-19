@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="在实际项目开发过程中，会引用很多的依赖，由于依赖本身也有依赖，如果使用了不同的版本，就会很容易遇到jar包冲突问题，因此，解决jar包冲突问题就显得尤为重要。"><meta name="generator" content="Astro v6.3.5"><meta name="theme-color" content="#fcfcfb"><title>Maven-仓库 | 陈建源的博客</title><link rel="stylesheet" href="/_astro/BaseLayout.C0X8Kjed.css"></head> <body> <div class="site-bg" aria-hidden="true"></div> <div class="site-shell"> <header class="site-header"> <nav class="site-nav" aria-label="主导航"> <a class="brand" href="/" aria-label="TechStack 首页"> <span class="brand-copy"> <strong>TechStack</strong> <small>陈建源的技术博客</small> </span> </a> <div class="nav-actions"> <div class="nav-links" data-nav-links> <div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>Java</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/基础知识/">基础知识</a><a href="/m/集合框架/">集合框架</a><a href="/m/并发编程/">并发编程</a><a href="/m/JVM/">JVM</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>数据库</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/MySQL/">MySQL</a><a href="/m/Redis/">Redis</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>源码框架</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/OpenFeign/">OpenFeign</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>设计与理论</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/设计模式/">设计模式</a><a href="/m/数据结构教程/">数据结构教程</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>工具</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/Maven/">Maven</a> </div> </div><div class="nav-group" data-nav-group> <button type="button" class="nav-group-trigger" aria-expanded="false"> <span>语言</span> <span class="nav-caret" aria-hidden="true"></span> </button> <div class="nav-menu"> <a href="/m/C语言入门手册/">C 语言</a> </div> </div><a href="/m/"> <span>全部分类</span> </a><a href="/archives/"> <span>归档</span> </a><a href="/search/"> <span>搜索</span> </a> </div> <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-label="打开导航" aria-expanded="false"> <span></span> <span></span> </button> </div> </nav> </header> <main class="site-main">  <div class="reading-progress" data-reading-progress aria-hidden="true"></div> <article class="article-layout"> <div class="article-main"> <header class="article-header"> <div class="article-meta"> <a href="/m/Maven/">Maven</a> <span>2020/08/03</span>  <span>9 分钟阅读</span> </div> <h1>Maven-仓库</h1> <p>在实际项目开发过程中，会引用很多的依赖，由于依赖本身也有依赖，如果使用了不同的版本，就会很容易遇到jar包冲突问题，因此，解决jar包冲突问题就显得尤为重要。</p> <div class="article-tags" aria-label="文章标签"> <a class="article-tag-link" href="/tags/maven/">
+#maven </a> </div> </header> <div class="prose" data-pagefind-body>  <p>在 Maven 的术语中，仓库是一个位置（place）。
+Maven 仓库是项目中依赖的第三方库，这个库所在的位置叫做仓库。
+在 Maven 中，任何一个依赖、插件或者项目构建的输出，都可以称之为构件。
+Maven 仓库能帮助我们管理构件（主要是JAR），它就是放置所有JAR文件（WAR，ZIP，POM等等）的地方。
+Maven 仓库有三种类型：</p>
+<ul>
+<li>本地（local）</li>
+<li>中央（central）</li>
+<li>远程（remote）</li>
+</ul>
+<hr>
+<h3 id="本地仓库">本地仓库</h3>
+<p>Maven一个很突出的功能就是jar包管理，一旦工程需要依赖哪些jar包，只需要在Maven的<code>pom.xml</code>配置一下，该jar包就会自动引入工程目录。初次听来会觉得很神奇，下面我们来探究一下它的实现原理。</p>
+<p>首先，这些jar包肯定不是没爹没娘的孩子，它们有来处，也有去处。集中存储这些jar包（还有插件等）的地方被称之为仓库（<code>Repository</code>）。
+不管这些jar包从哪里来的，必须存储在自己的电脑里之后，你的工程才能引用它们。类似于电脑里有个客栈，专门款待这些远道而来的客人，这个客栈就叫做本地仓库。</p>
+<p>比如，工程中需要依赖<code>spring-core</code>这个jar包，在<code>pom.xml</code>中声明之后，maven会首先在本地仓库中找，如果找到了很好办，自动引入工程的依赖lib库即可。可是，万一找不到呢？实际上这种情况经常发生，尤其初次使用maven的时候，本地仓库肯定是空无一物的，这时候就要靠maven大展神通，去远程仓库去下载。</p>
+<p>默认情况下，不管Linux还是 Windows，每个用户在自己的用户目录下都有一个路径名为 <code>.m2/respository/</code> 的仓库目录。
+Maven 本地仓库默认被创建在 用户目录下。要修改默认位置，在 Maven安装目录中的 <code>conf</code>文件夹下的 <code>settings.xml</code> 文件中定义另一个路径。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">settings</span><span style="color:#B392F0"> xmlns</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"http://maven.apache.org/SETTINGS/1.0.0"</span></span>
+<span class="line"><span style="color:#B392F0">   xmlns:xsi</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"http://www.w3.org/2001/XMLSchema-instance"</span></span>
+<span class="line"><span style="color:#B392F0">   xsi:schemaLocation</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"http://maven.apache.org/SETTINGS/1.0.0</span></span>
+<span class="line"><span style="color:#9ECBFF">   http://maven.apache.org/xsd/settings-1.0.0.xsd"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">localRepository</span><span style="color:#E1E4E8">>C:/MyLocalRepository&#x3C;/</span><span style="color:#85E89D">localRepository</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">settings</span><span style="color:#E1E4E8">></span></span></code></pre>
+<h3 id="中央仓库">中央仓库</h3>
+<p>Maven 中央仓库是由 Maven 社区提供的仓库，其中包含了大量常用的库。</p>
+<p>中央仓库包含了绝大多数流行的开源Java构件，以及源码、作者信息、SCM、信息、许可证信息等。一般来说，简单的Java项目依赖的构件都可以在这里下载到。</p>
+<p>中央仓库的关键概念：</p>
+<ul>
+<li>这个仓库由 Maven 社区管理。</li>
+<li>不需要配置。</li>
+<li>需要通过网络才能访问。</li>
+</ul>
+<p>要浏览中央仓库的内容，maven 社区提供了一个 URL：<a href="http://search.maven.org/#browse">http://search.maven.org/#browse</a>。使用这个仓库，开发人员可以搜索所有可以获取的代码库。</p>
+<h3 id="远程仓库">远程仓库</h3>
+<p>如果 Maven 在中央仓库中也找不到依赖的文件，它会停止构建过程并输出错误信息到控制台。为避免这种情况，Maven 提供了远程仓库的概念，它是开发人员自己定制仓库，包含了所需要的代码库或者其他工程中用到的 jar 文件。</p>
+<p>一般来讲，公司都会通过自己的私有服务器在局域网内架设一个仓库代理。私服可以看作一种特殊的远程仓库，代理广域网上的远程仓库，供局域网内的Maven用户使用。当Maven需要下载构件的时候，先从私服请求，如果私服上不存在该构件，则从外部的远程仓库下载，缓存在私服上之后，再为Maven的下载请求提供服务。
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803115915100.png" alt="Maven 远程仓库">
+Maven私服有很多好处：</p>
+<ul>
+<li>
+<p>可以把公司的私有jar包，以及无法从外部仓库下载到的构件上传到私服上，供公司内部使用；</p>
+</li>
+<li>
+<p>节省自己的外网带宽：减少重复请求造成的外网带宽消耗；</p>
+</li>
+<li>
+<p>加速Maven构建：如果项目配置了很多外部远程仓库的时候，构建速度就会大大降低；</p>
+</li>
+<li>
+<p>提高稳定性，增强控制：Internet不稳定的时候，maven构建也会变的不稳定，一些私服软件还提供了其他的功能</p>
+</li>
+</ul>
+<p>当前主流的maven私服有Apache的Archiva、JFrog的Artifactory以及Sonatype的Nexus。</p>
+<p>上面提到的中央仓库、中央仓库的镜像仓库、其他公共仓库、私服都属于远程仓库的范畴。</p>
+<h3 id="maven-依赖搜索顺序">Maven 依赖搜索顺序</h3>
+<p>当我们执行 Maven 构建命令时，Maven 开始按照以下顺序查找依赖的库：</p>
+<p>1.在本地仓库中搜索，如果找不到，执行步骤 2，如果找到了则执行其他操作。
+2.在中央仓库中搜索，如果找不到，并且有一个或多个远程仓库已经设置，则执行步骤 4，如果找到了则下载到本地仓库中已被将来引用。
+3.如果远程仓库没有被设置，Maven 将简单的停滞处理并抛出错误（无法找到依赖的文件）。
+4.在一个或多个远程仓库中搜索依赖的文件，如果找到则下载到本地仓库已被将来引用，否则 Maven 将停止处理并抛出错误（无法找到依赖的文件）。</p>
+<h3 id="仓库的配置">仓库的配置</h3>
+<p>仓库配置要做两件事，一是告诉maven你的本地仓库在哪里，二是你的远程仓库在哪里。</p>
+<p>顾名思义，<code>setting.xm</code>的第一个节点<code>&#x3C;localRepository></code>就是配置本地仓库的地方，不用赘言。</p>
+<p>远程仓库的配置有些复杂，因为会涉及很多附属特性。下面以一切从实际出发，看看使用私服的情况下如何配置远程仓库。稍微像样的公司都会建立自己的私服，如果一个公司连自己的私服都没有（别管是因为买不起服务器还是技术上做不到），你可以考虑一下跳槽的问题了。</p>
+<p>现在最流行的maven仓库管理器就是大名鼎鼎的Nexus（发音[ˈnɛksəs]，英文中代表“中心、魔枢”的意思），它极大地简化了自己内部仓库的维护和外部仓库的访问。利用Nexus可以只在一个地方就能够完全控制访问和部署在你所维护仓库中的每个Artifact。Nexus是一套“开箱即用”的系统不需要数据库，它使用文件系统加Lucene来组织数据。</p>
+<p>至于Nexus怎么部署，怎么维护仓库，作为开发人员是不需要关心的，只需要把Nexus私服的局域网地址写入maven的本地配置文件即可。具体的配置方法如下：</p>
+<p>1、设置镜像</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">mirrors</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">mirror</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#6A737D">       &#x3C;!--该镜像的唯一标识符。id用来区分不同的mirror元素。 --></span></span>
+<span class="line"><span style="color:#E1E4E8">       &#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">>nexus&#x3C;/</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#6A737D">       &#x3C;!-- 镜像名，起注解作用，应做到见文知意。可以不配置  --></span></span>
+<span class="line"><span style="color:#E1E4E8">       &#x3C;</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">>Human Readable Name &#x3C;/</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#6A737D">       &#x3C;!--  所有仓库的构件都要从镜像下载  --></span></span>
+<span class="line"><span style="color:#E1E4E8">       &#x3C;</span><span style="color:#85E89D">mirrorOf</span><span style="color:#E1E4E8">>*&#x3C;/</span><span style="color:#85E89D">mirrorOf</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#6A737D">       &#x3C;!-- 私服的局域网地址--></span></span>
+<span class="line"><span style="color:#E1E4E8">       &#x3C;</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8">>http://192.168.0.1:8081/nexus/content/groups/public/&#x3C;/</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#85E89D">mirror</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">mirrors</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p>节点<code>&#x3C;mirrors></code>下面可以配置多个镜像，<code>&#x3C;mirrorOf></code>用于指明是哪个仓库的镜像，上例中使用通配符 <code>*</code> 表明该私服是所有仓库的镜像，不管本地使用了多少种远程仓库，需要下载构件时都会从私服请求。</p>
+<p>如果只想将私服设置成某一个远程仓库的镜像，使用<code>&#x3C;mirrorOf></code>指定该远程仓库的ID即可。</p>
+<p>2、设置远程仓库
+远程仓库的设置是在<profile>节点下面：</profile></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">repositories</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">repository</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">   &#x3C;!--仓库唯一标识 --></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">>repoId &#x3C;/</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">   &#x3C;!--远程仓库名称  --></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">>repoName&#x3C;/</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">&#x3C;!--远程仓库URL，如果该仓库配置了镜像，这里的URL就没有意义了，因为任何下载请求都会交由镜像仓库处理，前提是镜像（也就是设置好的私服）需要确保该远程仓库里的任何构件都能通过它下载到  --></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8">>http://……&#x3C;/</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">   &#x3C;!--如何处理远程仓库里发布版本的下载 --></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">releases</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">      &#x3C;!--true或者false表示该仓库是否为下载某种类型构件（发布版，快照版）开启。   --></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8">>false&#x3C;/</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">      &#x3C;!-- 该元素指定更新发生的频率。Maven会比较本地POM和远程POM的时间戳。这里的选项是：--></span></span>
+<span class="line"><span style="color:#6A737D">      &#x3C;!-- always（一直），daily（默认，每日），interval：X（这里X是以分钟为单位的时间间隔），或者never（从不）。  --></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">updatePolicy</span><span style="color:#E1E4E8">>always&#x3C;/</span><span style="color:#85E89D">updatePolicy</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">      &#x3C;!--当Maven验证构件校验文件失败时该怎么做:--></span></span>
+<span class="line"><span style="color:#6A737D">      &#x3C;!--ignore（忽略），fail（失败），或者warn（警告）。 --></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">checksumPolicy</span><span style="color:#E1E4E8">>warn&#x3C;/</span><span style="color:#85E89D">checksumPolicy</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#85E89D">releases</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">   &#x3C;!--如何处理远程仓库里快照版本的下载，与发布版的配置类似 --></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">snapshots</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8">/></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">updatePolicy</span><span style="color:#E1E4E8">/></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">checksumPolicy</span><span style="color:#E1E4E8">/></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#85E89D">snapshots</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">repository</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">repositories</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p>可以配置多个远程仓库，用<id>加以区分。</id></p>
+<p>除此之外，还有一个与<code>&#x3C;repositories></code>并列存在<code>&#x3C;pluginRepositories></code>节点，用来配置插件的远程仓库。</p>
+<p>仓库主要存储两种构件。第一种构件被用作其它构件的依赖，最常见的就是各类jar包。这是中央仓库中存储的大部分构件类型。另外一种构件类型是插件，Maven插件是一种特殊类型的构件。由于这个原因，插件仓库独立于其它仓库。<code>&#x3C;pluginRepositories></code>节点与<code>&#x3C;repositories></code>节点除了根节点的名字不一样，子元素的结构与配置方法完全一样：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">pluginRepositories</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">pluginRepository</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;</span><span style="color:#85E89D">releases</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">                    &#x3C;</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">                    &#x3C;</span><span style="color:#85E89D">updatePolicy</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">                    &#x3C;</span><span style="color:#85E89D">checksumPolicy</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;/</span><span style="color:#85E89D">releases</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;</span><span style="color:#85E89D">snapshots</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">                    &#x3C;</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">                    &#x3C;</span><span style="color:#85E89D">updatePolicy</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">                    &#x3C;</span><span style="color:#85E89D">checksumPolicy</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">             &#x3C;/</span><span style="color:#85E89D">snapshots</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">pluginRepository</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">pluginRepositories</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p>远程仓库有<code>releases</code>和<code>snapshots</code>两组配置，POM就可以在每个单独的仓库中，为每种类型的构件采取不同的策略。例如，有时候会只为开发目的开启对快照版本下载的支持，就需要把<code>&#x3C;releases></code>中的<code>&#x3C;enabled ></code>设为<code>false</code>，而<code>&#x3C;snapshots></code>中的<code>&#x3C;enabled ></code>设为<code>true</code>。</p>
+<p>由于远程仓库的配置是挂在<code>&#x3C;profile></code>节点下面，如果配置有多个<code>&#x3C;profile></code>节点，那么就可能有多种远程仓库的设置方案，该方案是否生效是由它的父节点<code>&#x3C;profile></code>是否被激活决定的。</p>
+<p>3、设置发布权限
+私服的作用除了可以给全公司的人提供maven构件的下载，还有一个非常重要的功能，就是开发者之间的资源共享。</p>
+<p>一个大的项目往往是分模块进行开发的，各个模块之间存在依赖关系，比如一个交易系统，分为下单模块、支付模块、购物车模块等。现在开发下单模块的同学需要调用支付模块中的接口来完成支付功能，就需要将支付模块的某些jar包引入本地工程，才能调用它的接口；同时，开发购物车模块的同学需要调用下单模块的接口，来完成下单功能，他就需要依赖下单模块的某些jar包。这三个模块都在持续开发中，不可能将各自的源码传来传去支持对方的依赖。</p>
+<p>解决的方式是这样，每个模块完成了某个阶段性的功能，都会将提供对外服务的接口打成jar包，传到公司的私服当中，谁要使用该模块的功能，只需要在pom.xml文件中声明一下，maven就会像下载其他jar包那样把它引入你的工程。</p>
+<p>在开发过程中，在pom中声明的构件版本一般是快照版：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">dependency</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">groupId</span><span style="color:#E1E4E8">>com.yourCompany.trade&#x3C;/</span><span style="color:#85E89D">groupId</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">artifactId</span><span style="color:#E1E4E8">>trade-pay&#x3C;/</span><span style="color:#85E89D">artifactId</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">version</span><span style="color:#E1E4E8">>1.0.2-SNAPSHOT&#x3C;/</span><span style="color:#85E89D">version</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">dependency</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p>各个模块会不断的上传新的jar包，如果本地项目依赖的是快照版，那么maven一旦发现该jar包有新的发布，就会将它下载下来替代以前的旧版本。比如，支付模块在测试的时候发现有个bug，修复了一下，然后将快照版发布到私服。而你只需要专注于下单模块的开发，所依赖的支付模块的更新由maven处理，不需要关心。一旦你开发的模块修复了一个bug，或者添加了一个新功能等修改，只需要将发布一次快照版本到私服即可，谁需要依赖你的接口谁自然会去私服下载，你也不用关心。
+一般私服建立完毕之后不需要认证就可以访问，但是风险会很大，这时就需要使用<code>setting.xml</code>中的<code>servers</code>元素了。需要注意的是，配置私服的信息是在pom文件中，但是认证信息则是在<code>setting.xml</code>中，这是因为pom文件往往是被提交到代码仓库中供所有成员访问的，而<code>setting.xml</code>是存放在本地的，这样是安全的。</p>
+<p>在<code>settings.xm</code>l中，配置具有发布发布版本和快照版本权限的用户：
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803121850867.png" alt="server配置"></p>
+<p>上面的id是server的id，不是用户登陆的id，该id与distributionManagement中repository元素的id相匹配。maven是根据pom中的repository和distributionMnagement元素来找到匹配的发布地址：
+<img src="https://cdn.jsdelivr.net/gh/yuanjianchen/static@master/uPic/images/post/2020/08/1240-20200803121907372.png" alt="项目配置"></p>
+<p>注意：pom中的id必须与setting.xml中配置好的id一致。</p>
+<p>然后运行maven cleandeploy命令，将自己开发的构件部署在私服上供组织内其他用户使用（maven clean deploy和maven clean install的区别：deploy是将该构件部署在私服中，而install是将构件存入自己的本地仓库中）。</p>
+<p>在这里有人可能会有一个疑问，所有的仓库设置不是已经在setting.xml中配置好了吗，为什么在pom的发布管理节点当中还要配置一个url？</p>
+<p>Setting.xml中配置的是你从哪里下载构件，而这里配置的是你要将构件发布到哪里。有时候可能下载用的仓库与上传用的仓库是两个地址，但是绝大多数情况下，两者都是由私服充当，就是说两者是同一个地址。</p>
+<blockquote>
+<p>补充：
+Maven 仓库默认在国外， 国内使用难免很慢，我们可以更换为阿里云的仓库。
+第一步:修改 maven 根目录下的 conf 文件夹中的 setting.xml 文件，在 mirrors 节点上，添加内容如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">mirrors</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">mirror</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">>alimaven&#x3C;/</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">>aliyun maven&#x3C;/</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8">>http://maven.aliyun.com/nexus/content/groups/public/&#x3C;/</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">mirrorOf</span><span style="color:#E1E4E8">>central&#x3C;/</span><span style="color:#85E89D">mirrorOf</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">mirror</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">mirrors</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p>第二步: pom.xml文件里添加：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">repositories</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">repository</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">>alimaven&#x3C;/</span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">>aliyun maven&#x3C;/</span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8">>http://maven.aliyun.com/nexus/content/groups/public/&#x3C;/</span><span style="color:#85E89D">url</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">releases</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">          &#x3C;</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8">>true&#x3C;/</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">releases</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">snapshots</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">          &#x3C;</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8">>false&#x3C;/</span><span style="color:#85E89D">enabled</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">snapshots</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">repository</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">repositories</span><span style="color:#E1E4E8">></span></span></code></pre>
+</blockquote>
+<blockquote>
+<p>Maven 的 Snapshot 版本与 Release 版本
+1、Snapshot 版本代表不稳定、尚处于开发中的版本。
+2、Release 版本则代表稳定的版本。
+3、什么情况下该用 SNAPSHOT?
+协同开发时，如果 A 依赖构件 B，由于 B 会更新，B 应该使用 SNAPSHOT 来标识自己。这种做法的必要性可以反证如下：</p>
+<ul>
+<li>a. 如果 B 不用 SNAPSHOT，而是每次更新后都使用一个稳定的版本，那版本号就会升得太快，每天一升甚至每个小时一升，这就是对版本号的滥用。</li>
+<li>b.如果 B 不用 SNAPSHOT, 但一直使用一个单一的 Release 版本号，那当 B 更新后，A 可能并不会接受到更新。因为 A 所使用的 repository 一般不会频繁更新 release 版本的缓存（即本地 repository)，所以B以不换版本号的方式更新后，A在拿B时发现本地已有这个版本，就不会去远程Repository下载最新的 B</li>
+</ul>
+<p>4、 不用 Release 版本，在所有地方都用 SNAPSHOT 版本行不行？
+不行。正式环境中不得使用 snapshot 版本的库。 比如说，今天你依赖某个 snapshot 版本的第三方库成功构建了自己的应用，明天再构建时可能就会失败，因为今晚第三方可能已经更新了它的 snapshot 库。你再次构建时，Maven 会去远程 repository 下载 snapshot 的最新版本，你构建时用的库就是新的 jar 文件了，这时正确性就很难保证了。</p>
+</blockquote>  </div> <footer class="article-related"> <nav class="post-neighbors" aria-label="上一篇和下一篇"> <a href="/post/164885521/"><span>上一篇</span><strong>Maven-依赖关系</strong></a> <a href="/post/164885518/"><span>下一篇</span><strong>Maven-setting-xml</strong></a> </nav> <section class="related-list"> <h2>继续读</h2> <div> <a href="/post/164885517/"> <span>2020/08/03 · Maven</span> <strong>Maven-POM</strong> </a><a href="/post/164885513/"> <span>2020/08/03 · Maven</span> <strong>Maven-Idea查看解决jar包冲突</strong> </a><a href="/post/164885524/"> <span>2020/08/03 · Maven</span> <strong>Maven-插件</strong> </a> </div> </section> </footer> </div> <aside class="article-toc" aria-label="文章目录"><strong>目录</strong><nav><a class="toc-depth-3" href="#本地仓库">本地仓库</a><a class="toc-depth-3" href="#中央仓库">中央仓库</a><a class="toc-depth-3" href="#远程仓库">远程仓库</a><a class="toc-depth-3" href="#maven-依赖搜索顺序">Maven 依赖搜索顺序</a><a class="toc-depth-3" href="#仓库的配置">仓库的配置</a></nav></aside> </article>  </main> <footer class="site-footer"> <div> <strong>TechStack</strong> <span>后端工程、Java、JVM、数据库与系统设计。</span> </div> <div class="footer-links"> <a href="/atom.xml">RSS</a> <a href="/sitemap.xml">站点地图</a> <a href="/search/">搜索</a> </div> </footer> </div> <script type="module">function s(){const e=document.querySelector("[data-mobile-nav-toggle]"),r=document.querySelector("[data-nav-links]");if(!e||!r)return;const o=[...r.querySelectorAll("[data-nav-group]")],i=t=>{o.forEach(n=>{n!==t&&(n.dataset.open="false",n.querySelector(".nav-group-trigger")?.setAttribute("aria-expanded","false"))})},a=()=>{r.dataset.open="false",e.setAttribute("aria-expanded","false"),i()};e.addEventListener("click",()=>{const t=r.dataset.open!=="true";r.dataset.open=String(t),e.setAttribute("aria-expanded",String(t)),t||i()}),r.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{a()})}),o.forEach(t=>{const n=t.querySelector(".nav-group-trigger");n&&n.addEventListener("click",()=>{const c=t.dataset.open!=="true";i(t),t.dataset.open=String(c),n.setAttribute("aria-expanded",String(c))})}),document.addEventListener("click",t=>{const n=t.target;n instanceof Node&&(r.contains(n)||e.contains(n)||a())}),document.addEventListener("keydown",t=>{t.key==="Escape"&&a()})}function d(){const e=document.querySelector("[data-reading-progress]");if(!e)return;const r=()=>{const o=document.documentElement.scrollHeight-window.innerHeight,i=o<=0?0:Math.min(1,Math.max(0,window.scrollY/o));e.style.transform=`scaleX(${i})`};r(),window.addEventListener("scroll",r,{passive:!0}),window.addEventListener("resize",r)}function l(){const e=[...document.querySelectorAll(".article-toc a")];if(e.length===0)return;const r=new Map(e.map(a=>[decodeURIComponent(a.hash.slice(1)),a])),o=[...r.keys()].map(a=>document.getElementById(a)).filter(a=>!!a),i=new IntersectionObserver(a=>{const t=a.filter(n=>n.isIntersecting).sort((n,c)=>n.boundingClientRect.top-c.boundingClientRect.top)[0];t&&(e.forEach(n=>n.removeAttribute("aria-current")),r.get(t.target.id)?.setAttribute("aria-current","true"))},{rootMargin:"-18% 0px -68% 0px",threshold:[0,1]});o.forEach(a=>i.observe(a))}function u(){document.addEventListener("keydown",e=>{if(!(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey||e.target?.closest('input, textarea, select, [contenteditable="true"]'))){if(e.preventDefault(),location.pathname!=="/search/"){location.href="/search/";return}document.querySelector(".pagefind-ui__search-input")?.focus()}})}s();d();l();u();</script> </body> </html>
